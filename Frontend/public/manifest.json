@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "SSAFY Search Engine",
+  "description": "AI 검색 요약 익스텐션",
+  "version": "1.0",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "content/content-script.js",
+        "content/capture.js",
+        "library/html2canvas.min.js"
+      ],
+      "css": ["content/content.css"]
+    }
+  ],
+  "host_permissions": ["<all_urls>"],
+  "permissions": ["activeTab", "scripting", "tabs", "storage"]
+}
