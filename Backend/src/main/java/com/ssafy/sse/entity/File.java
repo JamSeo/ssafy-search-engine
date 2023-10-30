@@ -30,10 +30,7 @@ import lombok.NoArgsConstructor;
 public class File {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private Long id;
-
-	@Column(name="file_type", nullable= false)
-	private String fileType;
+	private Long seq;
 
 	@Lob
 	@Column(name="file_location", nullable= false)
@@ -44,4 +41,8 @@ public class File {
 
 	@Column(name="result")
 	private String result;
+
+	@Column(name="email")
+	private String email;
+
 }
