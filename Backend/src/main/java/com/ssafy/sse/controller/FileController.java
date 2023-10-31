@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sse.dto.FileDto;
 import com.ssafy.sse.dto.FileResDto;
+import com.ssafy.sse.dto.OcrResDto;
 import com.ssafy.sse.entity.File;
 import com.ssafy.sse.service.FileService;
 import com.ssafy.sse.service.OcrService;
@@ -38,7 +39,11 @@ public class FileController {
 	public ResponseEntity predict(@RequestPart(value="image") MultipartFile image){
 		// flask API 와 통신하여 결과 받아옴
 		String res = ocrService.sendPostRequestToFlaskServer(image);
-		return ResponseEntity.ok(res);
+		OcrResDto ocrResDto = OcrResDto.builder()
+			.result(res)
+			.build();
+
+		return ResponseEntity.ok(ocrResDto);
 	}
 	@PostMapping
 	public ResponseEntity create(@RequestParam(value="result") String result,
