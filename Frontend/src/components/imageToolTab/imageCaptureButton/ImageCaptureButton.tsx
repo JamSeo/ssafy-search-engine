@@ -6,7 +6,7 @@ import { TbPhotoSensor } from "react-icons/tb";
 const sendMessage2Background = (action: string, tabId: number) => {
   chrome.runtime.sendMessage({ action: action, tabId: tabId });
 };
-
+ 
 const ImageCaptureButton: React.FC = () => {
   const handleCaptureClick = async () => {
     // 1. 현재 chrome 탭에 script 전달
@@ -35,6 +35,28 @@ const ImageCaptureButton: React.FC = () => {
     ) => {
       if (message.action === "imageData") {
         console.log(message.data);
+        const apiUrl = 'http://localhost:8080/ocr/predict'; // 대상 URL
+
+        const formData = new FormData();
+        fetch(message.data)
+          .then(res => res.blob().then(blob=>{
+            formData.append('image', blob, "image.png")
+            fetch(apiUrl, {
+              method: 'POST',
+              body: formData
+            })
+              .then(response => response.json())
+              .then(data => {
+                // 요청이 성공했을 때의 처리
+                console.log(data);
+              })
+              .catch(error => {
+                // 요청이 실패했을 때의 처리
+                console.error(error);
+              });
+        }))
+        
+        
       }
     };
     // 리스너 등록
