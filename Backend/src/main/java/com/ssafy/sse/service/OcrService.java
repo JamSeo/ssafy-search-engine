@@ -1,6 +1,7 @@
 package com.ssafy.sse.service;
 
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,9 +31,11 @@ public class OcrService {
 		try {
 			byte[] fileBytes = file.getBytes();
 			ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+				LocalDateTime now = LocalDateTime.now();
 				@Override
 				public String getFilename() {
-					return file.getOriginalFilename(); // 파일의 원본 이름을 사용합니다.
+					// return file.getOriginalFilename(); // 파일의 원본 이름을 사용합니다.
+					return "email@" + now +".jpg";
 				}
 			};
 
