@@ -28,7 +28,7 @@ const ImageUploadButton: React.FC = () => {
     <>
       <S.ImgUploadButton onClick={onUploadImage}>
         <TbPhotoUp size={18} />
-        Upload Image
+        UPLOAD IMAGE
       </S.ImgUploadButton>
     </>
   );
