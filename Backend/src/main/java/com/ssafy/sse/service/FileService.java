@@ -39,9 +39,6 @@ public class FileService {
 	public List<FileResDto> searchAll(String email) {
 		List<File> fileList = fileRepository.findAllByEmail(email);
 		System.out.println(fileList.toString());
-		if (fileList.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
 		List<FileResDto> files = new ArrayList<>();
 		for(File file :fileList){
 			FileResDto fileResDto = FileResDto.builder()
