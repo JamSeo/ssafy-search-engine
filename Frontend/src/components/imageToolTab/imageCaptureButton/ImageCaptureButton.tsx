@@ -27,67 +27,67 @@ const ImageCaptureButton: React.FC = () => {
 
   // 3. 캡쳐된 이미지 반환 받음
   useEffect(() => {
+  //   // 메시지 리스너 함수
+  //   const handleMessage = (
+  //     message: { action: string; data: any },
+  //     sender: any,
+  //     sendResponse: any
+  //   ) => {
+  //     if (message.action === "imageData") {
+  //       console.log(message.data);
+  //       const apiUrl = "http://localhost:8080/ocr/predict"; // 대상 URL
+
+  //       const formData = new FormData();
+  //       fetch(message.data).then((res) =>
+  //         res.blob().then((blob) => {
+  //           formData.append("image", blob, "image.png");
+  //           fetch(apiUrl, {
+  //             method: "POST",
+  //             body: formData,
+  //           })
+  //             .then((response) => response.json())
+  //             .then((data) => {
+  //               // 요청이 성공했을 때의 처리
+  //               console.log(data);
+  //             })
+  //             .catch((error) => {
+  //               // 요청이 실패했을 때의 처리
+  //               console.error(error);
+  //             });
+  //         })
+  //       );
+  //     }
+  //   };
+
     // 메시지 리스너 함수
-    const handleMessage = (
+    const handleMessage = async (
       message: { action: string; data: any },
       sender: any,
       sendResponse: any
     ) => {
       if (message.action === "imageData") {
         console.log(message.data);
-        const apiUrl = "http://localhost:8080/ocr/predict"; // 대상 URL
+        const apiUrl = "http://localhost:8080/ocr/predict";
 
-        const formData = new FormData();
-        fetch(message.data).then((res) =>
-          res.blob().then((blob) => {
-            formData.append("image", blob, "image.png");
-            fetch(apiUrl, {
-              method: "POST",
-              body: formData,
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                // 요청이 성공했을 때의 처리
-                console.log(data);
-              })
-              .catch((error) => {
-                // 요청이 실패했을 때의 처리
-                console.error(error);
-              });
-          })
-        );
+        try {
+          const response = await fetch(message.data);
+          const blob = await response.blob();
+
+          const formData = new FormData();
+          formData.append("image", blob, "image.png");
+
+          const ocrResponse = await fetch(apiUrl, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await ocrResponse.json();
+          console.log(data);
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
-
-    // // 메시지 리스너 함수
-    // const handleMessage = async (
-    //   message: { action: string; data: any },
-    //   sender: any,
-    //   sendResponse: any
-    // ) => {
-    //   if (message.action === "imageData") {
-    //     console.log(message.data);
-    //     const apiUrl = "http://localhost:8080/ocr/predict";
-
-    //     try {
-    //       const response = await fetch(message.data);
-    //       const blob = await response.blob();
-
-    //       const formData = new FormData();
-    //       formData.append("image", blob, "image.png");
-
-    //       const ocrResponse = await fetch(apiUrl, {
-    //         method: "POST",
-    //         body: formData,
-    //       });
-
-    //       const data = await ocrResponse.json();
-    //       console.log(data);
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    //   }
-    // };
 
     // 리스너 등록
     chrome.runtime.onMessage.addListener(handleMessage);

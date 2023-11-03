@@ -35,6 +35,11 @@ public class FileController {
 	private final OcrService ocrService;
 	private final S3UploadService s3UploadService;
 
+	@PostMapping("/url")
+	public ResponseEntity getOcrUrl(@RequestParam(value="url") String url){
+		System.out.println(url);
+		return ResponseEntity.ok("ok");
+	}
 	@PostMapping("/predict")
 	public ResponseEntity predict(@RequestPart(value="image") MultipartFile image){
 		// flask API 와 통신하여 결과 받아옴
