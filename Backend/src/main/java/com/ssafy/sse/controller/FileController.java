@@ -37,7 +37,7 @@ public class FileController {
 
 	@PostMapping("/url")
 	public ResponseEntity getOcrUrl(@RequestParam(value="url") String url){
-		System.out.println(url);
+		ocrService.saveUrl(url);
 		return ResponseEntity.ok("ok");
 	}
 	@PostMapping("/predict")
