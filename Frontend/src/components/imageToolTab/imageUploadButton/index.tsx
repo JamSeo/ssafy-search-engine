@@ -26,10 +26,10 @@ const ImageUploadButton: React.FC = () => {
 
   return (
     <>
-      <S.ImgUploadButton onClick={onUploadImage}>
+      <S.ImageUploadButton onClick={onUploadImage}>
         <TbPhotoUp size={18} />
         UPLOAD IMAGE
-      </S.ImgUploadButton>
+      </S.ImageUploadButton>
     </>
   );
 };

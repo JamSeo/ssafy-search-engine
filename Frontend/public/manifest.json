@@ -21,11 +21,16 @@
     }
   ],
   "host_permissions": ["<all_urls>"],
-  "permissions": ["activeTab", "scripting", "tabs", "storage"],
+  "permissions": ["identity", "activeTab", "scripting", "tabs", "storage"],
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAogwK8JZxkNifNUOFccH4TFpDMVmxpU7ULEE0kvVQ+xurZUy98b/bl3layCdemuIfe89ggKVwksmL6NKzT2Gfq4kRXL7rIlfykFVrF4xGWVzWnOlUa3DeaGbZ/z2dW/yQDCXWJAQoECCxgZUraYTbZOLEHLRkDJI6zsIVIT6O5ii2uoWHSGFSGmLbP5iNLYexvjLotPmUFnlwDG739LtvtLLoA8snZWtz59+GdEcP8WiOMRxtqrvtRsmkuSAC8k/cGsnpiTX/VSw9KnAuQoRtnhsb4GcRqhtFpyK5pMa0dDPgPAsF4SQT/pi518i/yeR7JjGJRO5cDr6iDttXuoj1PwIDAQAB",
+  "oauth2": {
+    "client_id": "565410954604-7tm35fhapudpfhkoh4mk1l2bok28altu.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/contacts.readonly"]
   }
 }
