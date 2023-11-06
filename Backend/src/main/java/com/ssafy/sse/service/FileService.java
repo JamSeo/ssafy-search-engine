@@ -31,11 +31,6 @@ public class FileService {
 		return fileRepository.save(file);
 	}
 
-	public File readOne(Long id) {
-		return fileRepository.findById(id)
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-	}
-
 	public List<FileResDto> searchAll(String email) {
 		List<File> fileList = fileRepository.findAllByEmail(email);
 		System.out.println(fileList.toString());
