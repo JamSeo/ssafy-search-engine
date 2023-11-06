@@ -1,12 +1,10 @@
 package com.ssafy.sse.service;
 
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,16 +16,40 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sse.entity.OcrUrl;
+import com.ssafy.sse.repository.OcrUrlRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class OcrService {
 
-	@Value("${AI_OCR_URL}")
-	private String url;
+	private final OcrUrlRepository ocrUrlRepository;
 
 	@Autowired
 	private RestTemplate restTemplate;
 
+
+
+	public String saveUrl(String url){
+		String PrevOcrUrl = ocrUrlRepository.findTopDest();
+		if(PrevOcrUrl != null) {
+			ocrUrlRepository.updateDest(url);
+			return "updated";
+		}
+		OcrUrl ocrUrl = OcrUrl.builder()
+			.dest(url)
+			.build();
+		ocrUrlRepository.save(ocrUrl);
+		return "saved";
+	}
+
 	public String sendPostRequestToFlaskServer(MultipartFile file) {
+		String PrevOcrUrl = ocrUrlRepository.findTopDest();
+		if(PrevOcrUrl == null){
+			return "no_url";
+		}
 		try {
 			byte[] fileBytes = file.getBytes();
 			ByteArrayResource resource = new ByteArrayResource(fileBytes) {
@@ -51,7 +73,7 @@ public class OcrService {
 			HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
 			// POST 요청 보내기
-			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+			ResponseEntity<String> responseEntity = restTemplate.exchange(PrevOcrUrl + "/ai/ocr", HttpMethod.POST, requestEntity, String.class);
 
 			return responseEntity.getBody();
 		} catch (Exception e) {
