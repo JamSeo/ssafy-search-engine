@@ -6,10 +6,15 @@ spring:
     url: jdbc:mysql://localhost:${MYSQL_HOST_PORT}/SSE?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${MYSQL_HOST}
     password: ${MYSQL_PW}
+
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         use-new-id-generator-mappings: false
@@ -17,6 +22,29 @@ spring:
     properties:
       hibernate.format_sql: true
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1015195423851-eper14rsstocq27o4i5ni2qhlffrh42g.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+            authorization-grant-type: authorization_code
+            scope: email
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    ttl:
+      refresh_token: 1209600000
+
+  jwt:
+    secret: imhungryiwantfood
+    access-expiration: 7200000
+    refresh-expiration: 1209600000
 cloud:
   aws:
     s3:
@@ -29,5 +57,9 @@ cloud:
       auto: false
     stack:
       auto: false
+<<<<<<< Backend/src/main/resources/application.yml
+
+=======
 server:
   port: 8081
+>>>>>>> Backend/src/main/resources/application.yml
