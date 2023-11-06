@@ -31,6 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+
 //                .cors().configurationSource(corsConfigurationSource())
 //                .and()
                 .httpBasic().disable()
@@ -46,10 +47,13 @@ public class SecurityConfig {
 //                .antMatchers("/succ/**").permitAll()
 //                .antMatchers("/test/**").permitAll()
 //                .antMatchers("/css/**","/images/**","/js/**").permitAll()
-//                .antMatchers("/").permitAll()
-                .antMatchers().permitAll()
+                    .antMatchers("/**").permitAll()
+                    // .antMatchers().permitAll()
+                    // .anyRequest().authenticated()
+
 //                .anyRequest().authenticated()
                 .and()
+
                 .oauth2Login()//oauth2 로그인 설정 시작
                 .userInfoEndpoint().userService(customOAuth2UserService)// OAuth2 로그인시 사용자 정보를 가져오는 엔드 포인트 및 사용자 서비스 설정
                 .and()
@@ -58,6 +62,7 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class);
+
                 //JWT 인증 필터를 usernapaaufilter 앞단에 적용한다.
         return http.build();
     }
