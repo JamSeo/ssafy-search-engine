@@ -3,9 +3,9 @@ spring:
     import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/SSE?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: 1234
+    url: jdbc:mysql://localhost:${MYSQL_HOST_PORT}/SSE?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_HOST}
+    password: ${MYSQL_PW}
 
 
   mvc:
@@ -57,4 +57,9 @@ cloud:
       auto: false
     stack:
       auto: false
+<<<<<<< Backend/src/main/resources/application.yml
 
+=======
+server:
+  port: 8081
+>>>>>>> Backend/src/main/resources/application.yml
