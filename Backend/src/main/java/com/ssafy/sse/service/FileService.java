@@ -1,5 +1,8 @@
 package com.ssafy.sse.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +24,7 @@ public class FileService {
 	private final FileRepository fileRepository;
 
 	public File create(FileDto fileDto) {
-		// 생성시 로그인된 이메일로 수정 필요
+		// 이메일 수정 필요
 		File file = File.builder()
 			.fileLocation(fileDto.getFileLocation())
 			.result(fileDto.getResult())
@@ -34,6 +37,15 @@ public class FileService {
 	public List<FileResDto> searchAll(String email) {
 		List<File> fileList = fileRepository.findAllByEmail(email);
 		System.out.println(fileList.toString());
+		return getFileResDtos(fileList);
+	}
+
+	public List<FileResDto> searchByDate(String date, String email){
+		List<File> fileList = fileRepository.findAllByEmailAndDate(date, email);
+		return getFileResDtos(fileList);
+	}
+
+	private List<FileResDto> getFileResDtos(List<File> fileList) {
 		List<FileResDto> files = new ArrayList<>();
 		for(File file :fileList){
 			FileResDto fileResDto = FileResDto.builder()
@@ -44,5 +56,13 @@ public class FileService {
 			files.add(fileResDto);
 		}
 		return files;
+	}
+
+	public List<FileResDto> searchByDateBetween(String start, String end, String email){
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		LocalDateTime startTime = LocalDateTime.parse(start + "T00:00:00.000", formatter);
+		LocalDateTime endTime = LocalDateTime.parse(end + "T23:59:59.997", formatter);
+		List<File> fileList = fileRepository.findAllByEmailAndDateBetween(startTime, endTime, email);
+		return getFileResDtos(fileList);
 	}
 }
