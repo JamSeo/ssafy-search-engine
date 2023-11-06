@@ -14,7 +14,7 @@ spring:
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         use-new-id-generator-mappings: false
@@ -31,7 +31,7 @@ spring:
           google:
             client-id: 1015195423851-eper14rsstocq27o4i5ni2qhlffrh42g.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+            redirect-uri: "http://localhost:8081/login/oauth2/code/google"
             authorization-grant-type: authorization_code
             scope: email
   redis:
@@ -57,9 +57,5 @@ cloud:
       auto: false
     stack:
       auto: false
-<<<<<<< Backend/src/main/resources/application.yml
-
-=======
 server:
   port: 8081
->>>>>>> Backend/src/main/resources/application.yml
