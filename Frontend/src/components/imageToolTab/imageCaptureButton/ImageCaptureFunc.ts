@@ -1,3 +1,4 @@
+import { serverApi } from "../../../utils/serverApi";
 import { IhandleCaptureData } from "../../../interface/ImageCaptureButton";
 
 // 원하는 영역과 크기로 이미지를 그리는 함수
@@ -54,28 +55,30 @@ const handleCaptureData = (
 ): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     const { startX, startY, width, height } = captureData;
+
+    // [0] 현재 탭 크기 가져오기
     const currentTab = await getActiveTab();
-    const currentTabWidth = currentTab?.width ?? 0; // 탭의 너비
-    const currentTabHeight = currentTab?.height ?? 0; // 탭의 높이
+    const browserWidth = currentTab?.width ?? 0;
+    const browserHeight = currentTab?.height ?? 0;
 
     chrome.tabs.captureVisibleTab((screenshotDataUrl) => {
-      const screenshotImage = new Image();
-      screenshotImage.src = screenshotDataUrl;
+      const browserImage = new Image();
+      browserImage.src = screenshotDataUrl;
 
-      screenshotImage.onload = () => {
-        // 1. 원래의 브라우저 크기로 이미지 크기 변환
-        const resizedScreenshotImage = resizeImage(
-          screenshotImage,
+      browserImage.onload = () => {
+        // [1] 전체화면 캡쳐 후 실제 브라우저 크기로 이미지 사이즈 변환
+        const realSizeImage = resizeImage(
+          browserImage,
           0,
           0,
-          screenshotImage.width,
-          screenshotImage.height,
-          currentTabWidth,
-          currentTabHeight
+          browserImage.width,
+          browserImage.height,
+          browserWidth,
+          browserHeight
         );
-        // 2. 변환된 이미지에서 캡쳐 영역 자르기
-        const croppedScreenshotImage = resizeImage(
-          resizedScreenshotImage,
+        // [2] 변환된 이미지에서 캡쳐 영역 자르기
+        const capturedImage = resizeImage(
+          realSizeImage,
           startX,
           startY,
           width,
@@ -83,13 +86,9 @@ const handleCaptureData = (
           width,
           height
         );
-
-        const croppedDataUrl = croppedScreenshotImage.toDataURL();
-        console.log(croppedDataUrl);
-        resolve(croppedDataUrl);
+        resolve(capturedImage.toDataURL());
       };
-
-      screenshotImage.onerror = () => {
+      browserImage.onerror = () => {
         reject("Failed to load captured image.");
       };
     });
@@ -98,7 +97,6 @@ const handleCaptureData = (
 
 // OCR API에 이미지를 전송하고 결과를 가져오는 함수
 const sendImageToOcrApi = async (imageUrl: string) => {
-  const apiUrl = "http://k9a708.p.ssafy.io:8081/ocr/predict";
   try {
     const response = await fetch(imageUrl);
     const blob = await response.blob();
@@ -107,14 +105,8 @@ const sendImageToOcrApi = async (imageUrl: string) => {
     formData.append("image", blob, "image.png");
 
     // OCR API에 POST 요청
-    const ocrResponse = await fetch(apiUrl, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await ocrResponse.json();
-    console.log(data);
-    return data;
+    const ocrResponse = await serverApi.post("/ocr/predict", formData);
+    return ocrResponse.data;
   } catch (error) {
     console.error(error);
     throw error;

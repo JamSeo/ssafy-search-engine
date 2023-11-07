@@ -20,15 +20,31 @@ const ImageCaptureButton: React.FC = () => {
       });
   };
 
+  // 캡쳐 이미지를 OCR 서버로 전송하는 함수
   const handleMessage = async (
     message: { action: string; data: IcaptureAreaData },
     sender: any,
     endResponse: any
   ) => {
     if (message.action === "captureAreaData") {
-      const captureData = await handleCaptureData(message.data);
-      sendImageToOcrApi(captureData);
-      return;
+      try {
+        // [1] 캡쳐된 이미지 parsing
+        const capturedImageUrl = await handleCaptureData(message.data);
+        console.log(capturedImageUrl);
+
+        // [2] parsing된 이미지 OCR 서버로 전송
+        const ocrResponseData = await sendImageToOcrApi(capturedImageUrl);
+        console.log(ocrResponseData);
+
+        // [3] 반환된 결과 content-script로 전송
+        chrome.runtime.sendMessage({
+          action: "ocrResponseData",
+          data: ocrResponseData,
+        });
+        return;
+      } catch (error) {
+        console.error("위치: ImageCaptureButton/index.tsx", error);
+      }
     }
   };
 
