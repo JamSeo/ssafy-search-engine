@@ -1,9 +1,11 @@
 package com.ssafy.sse.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,11 @@ public class FileController {
 	private final OcrService ocrService;
 	private final S3UploadService s3UploadService;
 
+	@PostMapping("/url")
+	public ResponseEntity getOcrUrl(@RequestParam(value="url") String url){
+		ocrService.saveUrl(url);
+		return ResponseEntity.ok("ok");
+	}
 	@PostMapping("/predict")
 	public ResponseEntity predict(@RequestPart(value="image") MultipartFile image){
 		// flask API 와 통신하여 결과 받아옴
@@ -45,7 +52,7 @@ public class FileController {
 
 		return ResponseEntity.ok(ocrResDto);
 	}
-	@PostMapping
+	@PostMapping("/create")
 	public ResponseEntity create(@RequestParam(value="result") String result,
 								@RequestPart(value="image") MultipartFile image) throws IOException {
 		String s3Url = s3UploadService.saveFile(image);
@@ -56,10 +63,29 @@ public class FileController {
 		File file = fileService.create(fileDto);
 		return ResponseEntity.ok(file);
 	}
-	@GetMapping
+	@GetMapping()
 	public ResponseEntity getData(){
-		// 사용자 로그인한 이메일로 변경 필요
+		// 이메일 수정 필요
 		List<FileResDto> fileList = fileService.searchAll("2@2");
+		return ResponseEntity.ok(fileList);
+	}
+	@GetMapping("/date")
+	public ResponseEntity getDataByDate(
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
+		@RequestParam(value="date") String date){
+		// 이메일 수정 필요
+		List<FileResDto> fileList = fileService.searchByDate(date,"2@2");
+		return ResponseEntity.ok(fileList);
+	}
+
+	@GetMapping("/range")
+	public ResponseEntity getDataByDateRange(
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
+		@RequestParam(value="start") String start,
+		@DateTimeFormat(pattern = "yyyy-MM-dd")
+		@RequestParam(value="end") String end){
+		// 이메일 수정 필요
+		List<FileResDto> fileList = fileService.searchByDateBetween(start, end,"2@2");
 		return ResponseEntity.ok(fileList);
 	}
 }
