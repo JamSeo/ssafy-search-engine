@@ -1,4 +1,3 @@
-// /* global chrome, html2canvas */
 /* global chrome */
 
 window.myCaptureTool = (() => {
@@ -102,51 +101,3 @@ window.myCaptureTool = (() => {
     activateCaptureMode: activateCaptureMode
   };
 })();
-
-
-
-
-
-// // 마우스 스크롤 범위 나타내는 함수
-// const updateSelectionArea = (start, end, bgElement) => {
-//   const scrollTop = window.scrollY || document.documentElement.scrollTop;
-//   const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-//   // 스크롤 위치를 고려한 실제 선택 영역 좌표
-//   const adjustedStart = {
-//     x: start.x - scrollLeft,
-//     y: start.y - scrollTop
-//   };
-//   const adjustedEnd = {
-//     x: end.x - scrollLeft,
-//     y: end.y - scrollTop
-//   };
-//   const top = Math.min(adjustedStart.y, adjustedEnd.y);
-//   const left = Math.min(adjustedStart.x, adjustedEnd.x);
-//   const right = document.documentElement.clientWidth - Math.max(adjustedStart.x, adjustedEnd.x);
-//   const bottom = document.documentElement.clientHeight - Math.max(adjustedStart.y, adjustedEnd.y);
-
-//   bgElement.style.borderWidth = `${top}px ${right}px ${bottom}px ${left}px`;
-// }
-
-
-// // 캡쳐 이미지 리턴 함수
-// const captureArea = async (start, end) => {
-//   const start_x = Math.min(start.x, end.x);
-//   const start_y = Math.min(start.y, end.y);
-//   const width = Math.abs(end.x - start.x) + 8;
-//   const height = Math.abs(end.y - start.y) + 8;
-//   const canvas = await html2canvas(document.body, {
-//     x: start_x,
-//     y: start_y,
-//     width: width,
-//     height: height
-//   });
-
-//   return canvas;
-// }
-
-// // 캡쳐 이미지 popup으로 전송 함수
-// const sendImageDataToPopup = (canvas) => {
-//   const imgDataUrl = canvas.toDataURL();
-//   chrome.runtime.sendMessage({ action: 'imageData', data: imgDataUrl });
-// }
