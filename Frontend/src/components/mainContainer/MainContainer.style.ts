@@ -1,13 +1,13 @@
 import styled from "styled-components";
 
 export const mainContainer = styled.div`
-  width: 340px;
+  width: 300px;
 `;
 
 export const TabListContainer = styled.div`
   box-sizing: border-box;
   height: 50px;
-  background-color: #000;
+  background-color: #111;
   color: #fff;
   display: flex;
   justify-content: space-between;
@@ -17,9 +17,9 @@ export const TabListContainer = styled.div`
 
 export const TabPanelContainer = styled.div`
   box-sizing: border-box;
-  min-height: 144px;
-  height: fit-content;
-  padding: 4px 8px 10px;
+  height: 144px;
+  overflow-y: auto;
+  background-color: #f8f8fa;
 `;
 
 export const Title = styled.h2`
@@ -39,7 +39,4 @@ export const CloseButton = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
 `;
