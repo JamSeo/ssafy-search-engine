@@ -1,8 +1,8 @@
 import * as S from "./MainContainer.style";
 
-import ImageToolTab from "../imageToolTab/ImageToolTab";
-import ResultTab from "../resultTab/ResultTab";
-import History from "../historyTab/HistroyTab";
+import ImageToolTab from "../imageToolTab";
+import ResultTab from "../resultTab";
+import History from "../historyTab";
 
 import { Tabs, Tab, TabList, TabPanel } from "@mui/joy";
 import { tabClasses } from "@mui/joy/Tab";

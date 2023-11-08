@@ -5,6 +5,7 @@ export const ImageToolTabContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 7px 8px;
 `;
 
 export const BaseButton = styled.div`
