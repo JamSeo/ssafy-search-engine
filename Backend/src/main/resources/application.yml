@@ -7,7 +7,11 @@ spring:
     username: ${MYSQL_HOST}
     password: ${MYSQL_PW}
 
-
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 100MB
+  
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
