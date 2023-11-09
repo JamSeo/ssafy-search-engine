@@ -1,5 +1,3 @@
-/* global chrome */
-
 window.myCaptureTool = (() => {
   // 상태 변수
   let isSelecting = false;
@@ -7,7 +5,7 @@ window.myCaptureTool = (() => {
   const body = document.body;
 
   // 캡쳐 모드 활성화
-  const activateCaptureMode = () => {
+  const activateCaptureMode = (callback) => {
     console.log("activateCaptureMode ON");
 
     // 이미 screenBg가 존재한다면 제거
@@ -17,11 +15,10 @@ window.myCaptureTool = (() => {
     body.classList.add("edit_cursor");
     const screenBg = createDivElement("screenshot_background");
     body.appendChild(screenBg);
-    addEventListeners(body, screenBg);
+    addEventListeners(body, screenBg, callback);
   }
 
-  // 마우스, 키보드 기능
-  const addEventListeners = (body, screenBg) => {
+  const addEventListeners = (body, screenBg, callback) => {
     // 마우스 클릭(캡쳐 시작)
     const handleMouseDown = (e) => {
       isSelecting = true;
@@ -46,8 +43,11 @@ window.myCaptureTool = (() => {
     const handleMouseUp = (e) => {
       if (!isSelecting) return;
       const endPoint = { x: e.clientX, y: e.clientY };
-      sendSelectedAreaToPopup(startPoint, endPoint);
+      const captureAreaData = parsingCaptureAreaData(startPoint, endPoint);
       deactivateCaptureMode();
+      // background로 sendResponse
+      callback(captureAreaData);
+      window.popupUtils.createPopup();
     }
 
     // 캡쳐 비활성화
@@ -80,14 +80,13 @@ window.myCaptureTool = (() => {
     bgElement.style.borderWidth = `${top}px ${right}px ${bottom}px ${left}px`;
   }
 
-  // 선택된 영역을 popup으로 전송하는 함수
-  const sendSelectedAreaToPopup = (start, end) => {
+  // 선택된 영역을 데이터로 parsing하는 함수
+  const parsingCaptureAreaData = (start, end) => {
     const startX = Math.min(start.x, end.x);
     const startY = Math.min(start.y, end.y);
     const width = Math.abs(end.x - start.x);
     const height = Math.abs(end.y - start.y);
-    const captureAreaData = { startX: startX, startY: startY, width: width, height: height }
-    chrome.runtime.sendMessage({ action: 'captureAreaData', data: captureAreaData });
+    return { startX, startY, width, height };
   }
 
   // div 태그 생성 함수
