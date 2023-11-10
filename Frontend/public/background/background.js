@@ -11,28 +11,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   // 로그인 요청
-  if (message.action === 'activateAuthMode') {
-    console.log("[background.js] 메시지 요청 내용: 'activateAuthMode'")
-    // chrome.windows.create({
-    //   url: "http://k9a708.p.ssafy.io:8081/swagger-ui/index.html#/",
-    //   type: 'popup',
-    // });
-    chrome.identity.launchWebAuthFlow(
+  if (message.action === "activateAuthMode") {
+    chrome.windows.create(
       {
-        url: "http://k9a708.p.ssafy.io:8081/login",
-        interactive: true,
+        url: "http://k9a708.p.ssafy.io:8081/swagger-ui/index.html#/",
+        type: "popup",
       },
-      (redirectUrl) => {
-        // redirectUrl에서 인증 코드 추출
-        if (redirectUrl) {
-          const url = new URL(redirectUrl);
-          const code = url.searchParams.get('code');
-          console.log(code);
-        }
+      (popupWindow) => {
+        // 팝업이 열린 후에 URL에서 코드를 찾아 저장하고 팝업을 닫음
+        chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+          if (
+            tabId === popupWindow.tabs[0].id &&
+            changeInfo.status === "complete"
+          ) {
+            chrome.tabs.get(tabId, (currentTab) => {
+              const currentURL = currentTab.url;
+              const url = new URL(currentURL);
+              const accessToken = url.searchParams.get("code");
+              console.log("[background.js] accessToken", accessToken);
+
+              if (accessToken.length > 0) {
+                // loacal storage에 AccessToken 저장
+                chrome.storage.local.set({ "accessToken": accessToken }, () => {
+                  console.log("[background.js] AccessToken is saved");
+                });
+                chrome.windows.remove(popupWindow.id); // 팝업 닫기
+              }
+            });
+          }
+        });
       }
     );
   }
 });
+
 
 /** 캡쳐 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
 const handleCaptureAreaData = async (message, sender, sendResponse) => {

@@ -1,20 +1,35 @@
-import { useState } from "react";
-import LoginPopup from "../loginPopup";
+import { useState, useEffect } from "react";
 
 const ResultTab: React.FC = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  const toggleForm = () => {
-    setIsAuthOpen(!isAuthOpen);
+  useEffect(() => {
+    const checkAccessToken = async () => {
+      const result = await new Promise<{ accessToken?: string }>(
+        (resolve, reject) => {
+          chrome.storage.local.get(["accessToken"], (res) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve(res as { accessToken?: string });
+            }
+          });
+        }
+      );
+
+      setIsAuthOpen(!!result.accessToken);
+    };
+
+    checkAccessToken();
+  }, []);
+
+  const requestAuthMode = () => {
+    chrome.runtime.sendMessage({ action: "activateAuthMode" });
   };
 
-  const requestLogin2Back = () => {
-    chrome.runtime.sendMessage({
-      action: "activateAuthMode",
-    });
-  };
-
-  return !isAuthOpen ? (
+  return isAuthOpen ? (
+    <div>앙 기모띠</div>
+  ) : (
     <div
       style={{
         height: "100%",
@@ -27,13 +42,7 @@ const ResultTab: React.FC = () => {
       }}
     >
       <p>Sorry, you need to sign in...</p>
-      {/* <button onClick={toggleForm}>Sign in</button> */}
-      <button onClick={requestLogin2Back}>Sign in</button>
-    </div>
-  ) : (
-    <div>
-      <button onClick={toggleForm}>Go Back</button>
-      <LoginPopup />
+      <button onClick={requestAuthMode}>Sign in</button>
     </div>
   );
 };
