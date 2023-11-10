@@ -19,9 +19,8 @@ public class TestController {
         return "loginfail";
     }
     @GetMapping("/test")
-    public String tess_2(@RequestParam String accessToken) {
-        log.info("뭐지 뭔지 모르겠는데 띠빠");
-        log.info(accessToken);
+    public String tess_2(@RequestParam String code) {
+        log.info(code);
         // 엑세스 토큰으로 현재 Redis 정보 삭제
         return "loginfail";
     }

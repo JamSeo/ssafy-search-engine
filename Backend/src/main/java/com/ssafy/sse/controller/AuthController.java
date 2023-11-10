@@ -3,12 +3,12 @@ package com.ssafy.sse.controller;
 import com.ssafy.sse.common.util.jwt.JwtUtil;
 import com.ssafy.sse.config.StatusResponseDto;
 import com.ssafy.sse.dto.RefreshToken;
+import com.ssafy.sse.dto.TokenResponseStatus;
 import com.ssafy.sse.repository.User.RefreshTokenRepository;
 import com.ssafy.sse.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -29,14 +29,6 @@ public class AuthController {
         return "hello";
     }
 
-//    @PostMapping("/signup")
-//    public ResponseEntity<Void> signup(@RequestBody sibalmondae) {
-//        String encodedPassword = encoder.encode(signupDto.getPassword());
-//        AuthDto.SignupDto newSignupDto = AuthDto.SignupDto.encodePassword(signupDto, encodedPassword);
-//
-//        userService.registerUser(newSignupDto);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
 
     @PostMapping("token/logout")
     public ResponseEntity<StatusResponseDto> logout(@RequestHeader("Authorization") final String accessToken) {
