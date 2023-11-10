@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 /** 캡쳐 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
 const handleCaptureAreaData = async (message, sender, sendResponse) => {
   try {
-    const { tabId, captureAreaData } = message;
+    const { tabId, captureAreaData, popupId } = message;
 
     // [1] 캡쳐된 이미지 parsing
     const capturedImageUrl = await parsingCaptureData(tabId, captureAreaData);
@@ -47,7 +47,7 @@ const handleCaptureAreaData = async (message, sender, sendResponse) => {
 
     // [3] 반환된 결과 content-script로 전송
     console.log("[background.js/handleCaptureAreaData] OCR 결과를 브라우저로 전송")
-    chrome.tabs.sendMessage(tabId, { action: "ocrResponseData", data: ocrResponseData });
+    chrome.tabs.sendMessage(tabId, { action: "ocrResponseData", data: ocrResponseData, popupId });
     return;
   } catch (error) {
     console.error("[background.js/handleCaptureAreaData] 전송 실패", error);
@@ -59,9 +59,9 @@ const parsingCaptureData = (tabId, captureAreaData) => {
   return new Promise(async (resolve, reject) => {
     try {
       // [0] 활성 탭 정보 가져오기
-      const { windowId, width, height } = await chrome.tabs.get(tabId);
+      const { width, height } = await chrome.tabs.get(tabId);
       // [1] 현재 보이는 탭 캡처
-      chrome.tabs.captureVisibleTab(windowId, { format: "jpeg" }, (imageUrl) => {
+      chrome.tabs.captureVisibleTab(null, { format: "jpeg" }, (imageUrl) => {
         // [2] 캡처된 이미지 parsing
         console.log("[background.js/parsingCaptureData] 메시지 요청 내용: processScreenshot");
         chrome.tabs.sendMessage(tabId, {

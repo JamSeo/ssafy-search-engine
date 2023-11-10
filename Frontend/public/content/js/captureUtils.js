@@ -44,10 +44,10 @@ window.myCaptureTool = (() => {
       if (!isSelecting) return;
       const endPoint = { x: e.clientX, y: e.clientY };
       const captureAreaData = parsingCaptureAreaData(startPoint, endPoint);
+      const popupId = "" + startPoint.y + endPoint.x;
       deactivateCaptureMode();
-      // background로 sendResponse
-      callback(captureAreaData);
-      window.popupUtils.createPopup();
+      callback(captureAreaData, popupId);
+      window.popupUtils.createPopup(popupId);
     }
 
     // 캡쳐 비활성화

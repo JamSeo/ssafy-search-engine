@@ -4,8 +4,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 캡쳐모드 실행
   if (message.action === 'activateCaptureMode') {
     const tabId = message.tabId
-    window.myCaptureTool.activateCaptureMode((captureAreaData) => {
-      sendResponse({ tabId, captureAreaData })
+    window.myCaptureTool.activateCaptureMode((captureAreaData, popupId) => {
+      sendResponse({ tabId, captureAreaData, popupId })
     });
     return true;
   }
@@ -24,8 +24,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // OCR 결과 popup에 띄우기
   if (message.action === 'ocrResponseData') {
-    const ocrData = message.data;
-    console.log("OCR 결과: ", ocrData);
-    window.popupUtils.updatePopup(ocrData);
+    const { data, popupId } = message;
+    console.log("OCR 결과: ", data);
+    window.popupUtils.updatePopup(popupId, data);
   }
 });
