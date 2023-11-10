@@ -37,6 +37,23 @@ public class FileController {
 	private final OcrService ocrService;
 	private final S3UploadService s3UploadService;
 
+	@PostMapping("/summarize")
+	public ResponseEntity summarize(@RequestParam(value="input") String text){
+		String res = ocrService.sendSummarizeRequestToFlaskServer(text);
+		OcrResDto ocrResDto = OcrResDto.builder()
+			.result(res)
+			.build();
+		return ResponseEntity.ok(ocrResDto);
+	}
+	@PostMapping("/translate")
+	public ResponseEntity translate(@RequestParam(value="input") String text){
+		String res = ocrService.sendTranslateRequestToFlaskServer(text);
+		OcrResDto ocrResDto = OcrResDto.builder()
+			.result(res)
+			.build();
+		return ResponseEntity.ok(ocrResDto);
+	}
+
 	@PostMapping("/url")
 	public ResponseEntity getOcrUrl(@RequestParam(value="url") String url){
 		ocrService.saveUrl(url);
