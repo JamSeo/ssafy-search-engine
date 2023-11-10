@@ -15,11 +15,12 @@ import com.ssafy.sse.entity.File;
 @Repository
 @Transactional
 public interface FileRepository extends JpaRepository<File, Long> {
+	@Query(value = "SELECT * from file where email = :email order by createDate desc", nativeQuery = true)
 	List<File> findAllByEmail(String email);
 
-	@Query(value = "SELECT * from file where email = :email and createDate between :start  and :end ", nativeQuery = true)
+	@Query(value = "SELECT * from file where email = :email and createDate between :start  and :end order by createDate desc", nativeQuery = true)
 	List<File>findAllByEmailAndDateBetween(LocalDateTime start, LocalDateTime end, String email);
-	@Query(value = "SELECT * from file where email = :email and  DATE_FORMAT(createDate, '%Y-%m-%d') = :date", nativeQuery = true)
+	@Query(value = "SELECT * from file where email = :email and  DATE_FORMAT(createDate, '%Y-%m-%d') = :date order by createDate desc", nativeQuery = true)
 	List<File>findAllByEmailAndDate(String date, String email);
 
 	@Query(value = "UPDATE url o SET o.dest = :dest where o.id = 1", nativeQuery = true)

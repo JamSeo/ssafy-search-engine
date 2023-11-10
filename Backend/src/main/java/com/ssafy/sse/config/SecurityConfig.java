@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .antMatchers("/swagger-ui/**").authenticated()
                 .antMatchers("/**").permitAll()
                     // .antMatchers().permitAll()
-                    // .anyRequest().authenticated()
+                    .anyRequest().permitAll()
 
 //                .anyRequest().authenticated()
                 .and()

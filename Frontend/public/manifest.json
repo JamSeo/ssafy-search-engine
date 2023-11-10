@@ -7,18 +7,19 @@
     "default_popup": "index.html"
   },
   "background": {
-    "service_worker": "background/background.js"
+    "service_worker": "background/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": [
-        "content/content-script.js",
-        "content/capture.js",
-        "content/ocr-response.js",
-        "library/html2canvas.min.js"
+        "content/js/contentScript.js",
+        "content/js/captureUtils.js",
+        "content/js/imageUtils.js",
+        "content/js/popupUtils.js"
       ],
-      "css": ["content/content.css"]
+      "css": ["content/css/captureUtils.css", "content/css/popupUtils.css"]
     }
   ],
   "host_permissions": ["<all_urls>"],
@@ -28,10 +29,5 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  },
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAogwK8JZxkNifNUOFccH4TFpDMVmxpU7ULEE0kvVQ+xurZUy98b/bl3layCdemuIfe89ggKVwksmL6NKzT2Gfq4kRXL7rIlfykFVrF4xGWVzWnOlUa3DeaGbZ/z2dW/yQDCXWJAQoECCxgZUraYTbZOLEHLRkDJI6zsIVIT6O5ii2uoWHSGFSGmLbP5iNLYexvjLotPmUFnlwDG739LtvtLLoA8snZWtz59+GdEcP8WiOMRxtqrvtRsmkuSAC8k/cGsnpiTX/VSw9KnAuQoRtnhsb4GcRqhtFpyK5pMa0dDPgPAsF4SQT/pi518i/yeR7JjGJRO5cDr6iDttXuoj1PwIDAQAB",
-  "oauth2": {
-    "client_id": "565410954604-7tm35fhapudpfhkoh4mk1l2bok28altu.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/contacts.readonly"]
   }
 }
