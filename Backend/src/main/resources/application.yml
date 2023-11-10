@@ -1,11 +1,11 @@
 spring:
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:./.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:${MYSQL_HOST_PORT}/SSE?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${MYSQL_HOST}
-    password: ${MYSQL_PW}
+    url: jdbc:mysql://localhost:3306/SSE?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 1234
 
   servlet:
     multipart:
@@ -35,7 +35,7 @@ spring:
           google:
             client-id: 1015195423851-eper14rsstocq27o4i5ni2qhlffrh42g.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: "http://localhost:8081/login/oauth2/code/google"
+            redirect-uri: "http://k9a708.p.ssafy.io:8081/login/oauth2/code/google"
             authorization-grant-type: authorization_code
             scope: email
   redis:
@@ -54,8 +54,8 @@ cloud:
     s3:
       bucket: sse-image
     credentials:
-      access-key: ${S3_ACCESS_KEY}
-      secret-key: ${S3_SECRET_KEY}
+      access-key: AKIA5NGC3NK2SK6IRUEZ
+      secret-key: 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
     region:
       static: ap-northeast-2
       auto: false

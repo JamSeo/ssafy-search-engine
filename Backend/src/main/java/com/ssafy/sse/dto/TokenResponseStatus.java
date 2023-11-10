@@ -1,4 +1,4 @@
-package com.ssafy.sse.controller;
+package com.ssafy.sse.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

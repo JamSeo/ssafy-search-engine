@@ -24,12 +24,14 @@ import java.util.Optional;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserService memberService;
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         log.info("oAuth로 로그인이 진행되게 되는경우 여기가 실행된다.");
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
+        log.info(oAuth2User.toString());
         // 클라이언트 등록 ID(google, naver, kakao)와 사용자 이름 속성을 가져온다.
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttributeName = userRequest.getClientRegistration()
@@ -56,6 +58,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             //// TODO: 2023-10-31 암소 메에ㅔ에에에에 
             //여기서 객체에서 회원이 없는 경우에 대해서는 회원가입을 진행 시켜줘야한다
             log.info("회원가입을 진행하는 로직");
+            //해당 회원이 없으면은
             return new DefaultOAuth2User(
                     Collections.singleton(new SimpleGrantedAuthority("SINGLE")),
                     memberAttribute, "email");
