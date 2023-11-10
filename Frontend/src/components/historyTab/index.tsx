@@ -1,38 +1,51 @@
-import * as S from "./HistoryTab.style";
-import { LuMessageSquare, LuPenLine, LuTrash2 } from "react-icons/lu";
+import { useState, useEffect } from "react";
+import HistoryTab from "./HistoryTab";
 
-const History: React.FC = () => {
-  const data = [
-    { title: "인간정보" },
-    { title: "기상정보" },
-    { title: "지형정보" },
-    { title: "인간정보" },
-    { title: "기상정보" },
-    { title: "지형정보" },
-  ];
+const SigninTab: React.FC = () => {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  return (
-    <div>
-      {data.map((element) => {
-        return <HistoryTab title={element.title} key={element.title} />;
-      })}
+  useEffect(() => {
+    const checkAccessToken = async () => {
+      const result = await new Promise<{ accessToken?: string }>(
+        (resolve, reject) => {
+          chrome.storage.local.get(["accessToken"], (res) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve(res as { accessToken?: string });
+            }
+          });
+        }
+      );
+
+      setIsAuthOpen(!!result.accessToken);
+    };
+
+    checkAccessToken();
+  }, []);
+
+  const requestAuthMode = () => {
+    chrome.runtime.sendMessage({ action: "activateAuthMode" });
+  };
+
+  return isAuthOpen ? (
+    <HistoryTab />
+  ) : (
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontWeight: "600",
+        color: "#333",
+      }}
+    >
+      <p>Sorry, you need to sign in...</p>
+      <button onClick={requestAuthMode}>Sign in</button>
     </div>
   );
 };
 
-type HistoryTabProps = {
-  title: string;
-};
-
-const HistoryTab: React.FC<HistoryTabProps> = ({ title }) => {
-  return (
-    <S.HistoryTab>
-      <LuMessageSquare className="messageIcon" />
-      <div className="title">{title}</div>
-      <LuPenLine className="editIcon" />
-      <LuTrash2 className="trashIcon" />
-    </S.HistoryTab>
-  );
-};
-
-export default History;
+export default SigninTab;

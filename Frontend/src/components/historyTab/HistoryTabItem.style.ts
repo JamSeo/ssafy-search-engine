@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const HistoryTab = styled.div`
+export const HistoryTabItem = styled.div`
   box-sizing: border-box;
   height: 40px;
   padding: 12px;
