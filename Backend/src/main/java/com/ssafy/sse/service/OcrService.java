@@ -16,6 +16,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import net.minidev.json.JSONObject;
+
 import com.ssafy.sse.entity.OcrUrl;
 import com.ssafy.sse.repository.OcrUrlRepository;
 
@@ -43,6 +45,47 @@ public class OcrService {
 			.build();
 		ocrUrlRepository.save(ocrUrl);
 		return "saved";
+	}
+
+	public String sendSummarizeRequestToFlaskServer(String text){
+		String PrevOcrUrl = ocrUrlRepository.findTopDest();
+		if(PrevOcrUrl == null){
+			return "no_url";
+		}
+		// JSON 객체 선언
+		JSONObject parameter = new JSONObject();
+		parameter.put("input", text);
+
+		// 요청 헤더 설정
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		// HttpEntity 생성
+		HttpEntity<String> requestEntity = new HttpEntity<>(parameter.toJSONString(), headers);
+		// POST 요청 보내기
+		ResponseEntity<String> responseEntity = restTemplate.exchange(PrevOcrUrl + "/ai/summarize", HttpMethod.POST, requestEntity, String.class);
+		return responseEntity.getBody();
+	}
+	public String sendTranslateRequestToFlaskServer(String text){
+		String PrevOcrUrl = ocrUrlRepository.findTopDest();
+		if(PrevOcrUrl == null){
+			return "no_url";
+		}
+
+		// JSON 객체 선언
+		JSONObject parameter = new JSONObject();
+		parameter.put("input", text);
+		// 요청 헤더 설정
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		// HttpEntity 생성
+		HttpEntity<String> requestEntity = new HttpEntity<>(parameter.toJSONString(), headers);
+
+		// POST 요청 보내기
+		ResponseEntity<String> responseEntity = restTemplate.exchange(PrevOcrUrl + "/ai/translate", HttpMethod.POST, requestEntity, String.class);
+
+		return responseEntity.getBody();
 	}
 
 	public String sendPostRequestToFlaskServer(MultipartFile file) {
