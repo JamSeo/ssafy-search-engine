@@ -9,6 +9,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       handleCaptureAreaData(response);
     });
   }
+
+  // 로그인 요청
+  if (message.action === 'activateAuthMode') {
+    console.log("[background.js] 메시지 요청 내용: 'activateAuthMode'")
+    // chrome.windows.create({
+    //   url: "http://k9a708.p.ssafy.io:8081/swagger-ui/index.html#/",
+    //   type: 'popup',
+    // });
+    chrome.identity.launchWebAuthFlow(
+      {
+        url: "http://k9a708.p.ssafy.io:8081/login",
+        interactive: true,
+      },
+      (redirectUrl) => {
+        // redirectUrl에서 인증 코드 추출
+        if (redirectUrl) {
+          const url = new URL(redirectUrl);
+          const code = url.searchParams.get('code');
+          console.log(code);
+        }
+      }
+    );
+  }
 });
 
 /** 캡쳐 이미지를 pasring하고 OCR 서버로 전송하는 함수 */

@@ -20,7 +20,6 @@
     "@types/react-dom": "^18.2.14",
     "@types/styled-components": "^5.1.29",
     "axios": "^1.5.1",
-    "html2canvas": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0",
