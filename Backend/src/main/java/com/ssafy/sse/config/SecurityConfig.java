@@ -47,7 +47,8 @@ public class SecurityConfig {
 //                .antMatchers("/succ/**").permitAll()
 //                .antMatchers("/test/**").permitAll()
 //                .antMatchers("/css/**","/images/**","/js/**").permitAll()
-                    .antMatchers("/**").permitAll()
+                .antMatchers("/swagger-ui/**").authenticated()
+                .antMatchers("/**").permitAll()
                     // .antMatchers().permitAll()
                     // .anyRequest().authenticated()
 
@@ -55,6 +56,8 @@ public class SecurityConfig {
                 .and()
 
                 .oauth2Login()//oauth2 로그인 설정 시작
+                //
+                //이이후를
                 .userInfoEndpoint().userService(customOAuth2UserService)// OAuth2 로그인시 사용자 정보를 가져오는 엔드 포인트 및 사용자 서비스 설정
                 .and()
                 .failureHandler(oAuth2LoginFailureHandler)// oauth2 로그인 실패시 처리하는 핸들러

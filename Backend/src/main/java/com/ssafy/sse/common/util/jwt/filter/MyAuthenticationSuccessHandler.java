@@ -49,16 +49,18 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         // 회원이 존재할경우
         if (isExist) {
             // 회원이 존재하면 jwt token 발행을 시작한다.
+            // 회원이 존재하고 header에 토큰이 존재하면 ?
             GeneratedToken token = jwtUtil.generateToken(email, role);
             log.info("jwtToken = {}", token.getAccessToken());
 
             // accessToken을 쿼리스트링에 담는 url을 만들어준다.
-            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/test")
-                    .queryParam("accessToken", token.getAccessToken())
+            String targetUrl = UriComponentsBuilder.fromUriString("http://k9a708.p.ssafy.io:8081/test")
+                    .queryParam("code", token.getAccessToken())
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
             log.info("redirect 준비");
+            log.info("redicrect there???");
             // 로그인 확인 페이지로 리다이렉트 시킨다.
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
             //
@@ -66,17 +68,17 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
 
 
         } else {
-
+            log.info("here???");
             // 회원이 존재하지 않을경우, 서비스 제공자와 email을 쿼리스트링으로 전달하는 url을 만들어준다.
             log.info("로그인할때 회원이 없으면 여기로 오나/??");
             log.info(provider);
 
+            GeneratedToken token = jwtUtil.generateToken(email, role);
             User user = User.builder().email(oAuth2User.getAttribute("email")).provider(provider).build();
             userService.save(user);
             //바로 회
-            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/test")
-                    .queryParam("email", (String) oAuth2User.getAttribute("email"))
-                    .queryParam("provider", provider)
+            String targetUrl = UriComponentsBuilder.fromUriString("http://k9a708.p.ssafy.io:8081/test")
+                    .queryParam("code", token.getAccessToken())
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();

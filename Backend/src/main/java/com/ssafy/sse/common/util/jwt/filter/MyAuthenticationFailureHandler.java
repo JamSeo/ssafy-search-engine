@@ -16,7 +16,7 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-
-        response.sendRedirect("http://localhost:8080");
+        log.info("auth fail이란 소린데");
+        response.sendRedirect("http://k9a708.p.ssafy.io:8081/fail");
     }
 }
