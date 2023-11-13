@@ -1,6 +1,7 @@
 package com.ssafy.sse.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.ssafy.sse.dto.CreateResDto;
 import com.ssafy.sse.dto.FileDto;
 import com.ssafy.sse.dto.FileResDto;
 import com.ssafy.sse.dto.OcrResDto;
+import com.ssafy.sse.dto.UrlReqDto;
 import com.ssafy.sse.entity.File;
 import com.ssafy.sse.service.FileService;
 import com.ssafy.sse.service.OcrService;
@@ -36,13 +38,13 @@ public class FileController {
 	private final JwtUtil jwtUtil;
 
 	@PostMapping("/delete")
-	public ResponseEntity delete(@RequestParam(name="url") String url, @RequestHeader HttpHeaders header){
+	public ResponseEntity delete(@RequestBody UrlReqDto urlReq, @RequestHeader HttpHeaders header){
 		String accessToken = header.getFirst("accessToken");
 		log.info("Token : {}",accessToken);
 		String email = jwtUtil.getUid(accessToken);
 		log.info("User Email : {}",email);
 
-		int res = fileService.deleteByUrl(url, email);
+		int res = fileService.deleteByUrl(urlReq.getUrl(), email);
 		return ResponseEntity.ok(res);
 	}
 	@PostMapping("/summarize")
