@@ -1,3 +1,5 @@
+/* global chrome */
+
 /** 팝업을 만들고 스타일을 설정하는 함수 */
 const createPopup = (popupId) => {
   if (!popupId || document.getElementById(popupId)) return;
@@ -41,7 +43,7 @@ const createPopup = (popupId) => {
 }
 
 /** OCR 결과를 업데이트 해주는 함수 */
-const updatePopup = (popupId, text) => {
+const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
   const popupContainer = document.getElementById(popupId);
 
   if (!popupContainer) return;
@@ -55,9 +57,25 @@ const updatePopup = (popupId, text) => {
   copyButton.classList.add("sse-copy-button");
   copyButton.textContent = "Copy";
   copyButton.onclick = () => {
-    navigator.clipboard.writeText(text);
+    console.log("[popupUtils.js/updatePopup] 결과 복사", ocrResponseData);
+    navigator.clipboard.writeText(ocrResponseData);
   };
   buttonContainer.insertBefore(copyButton, buttonContainer.firstChild);
+
+  // 저장 버튼 추가
+  const saveButton = document.createElement("button");
+  saveButton.classList.add("sse-popup-button");
+  saveButton.classList.add("sse-copy-button");
+  saveButton.textContent = "Save";
+  saveButton.onclick = () => {
+    console.log("[popupUtils.js/updatePopup] 서버에 저장 요청", ocrResponseData, capturedImageUrl);
+    chrome.runtime.sendMessage({
+      action: "saveOcrResult",
+      ocrResponseData,
+      capturedImageUrl,
+    });
+  };
+  buttonContainer.insertBefore(saveButton, buttonContainer.firstChild);
 
   // 깜빡이는 커서 효과 제거
   const popupContext = document.querySelector(".sse-popup-context");
@@ -70,8 +88,8 @@ const updatePopup = (popupId, text) => {
   const ocrResultText = document.createElement("div");
   ocrResultText.classList.add("sse-ocr-text");
   popupContainer.appendChild(ocrResultText);
-  if (text) {
-    typeText(ocrResultText, text, 0, 20);
+  if (ocrResponseData) {
+    typeText(ocrResultText, ocrResponseData, 0, 20);
   }
 }
 

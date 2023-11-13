@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import HistoryTab from "./HistoryTab";
+import SigninButton from "./SigninButton";
 
 const SigninTab: React.FC = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -24,28 +25,7 @@ const SigninTab: React.FC = () => {
     checkAccessToken();
   }, []);
 
-  const requestAuthMode = () => {
-    chrome.runtime.sendMessage({ action: "activateAuthMode" });
-  };
-
-  return isAuthOpen ? (
-    <HistoryTab />
-  ) : (
-    <div
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        fontWeight: "600",
-        color: "#333",
-      }}
-    >
-      <p>Sorry, you need to sign in...</p>
-      <button onClick={requestAuthMode}>Sign in</button>
-    </div>
-  );
+  return isAuthOpen ? <HistoryTab /> : <SigninButton />;
 };
 
 export default SigninTab;
