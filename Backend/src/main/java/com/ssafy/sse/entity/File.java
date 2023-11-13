@@ -39,7 +39,7 @@ public class File {
 	@CreatedDate
 	private LocalDateTime createDate;
 
-	@Column(name="result",columnDefinition = "LONGTEXT")
+	@Column(name="result", columnDefinition = "LONGTEXT")
 	private String result;
 
 	@Column(name="summarized_result")
