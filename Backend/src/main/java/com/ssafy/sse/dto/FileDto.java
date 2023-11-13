@@ -9,5 +9,7 @@ import lombok.Data;
 @Builder
 public class FileDto {
 	private String fileLocation;
+	private String translatedResult;
+	private String summarizedResult;
 	private String result;
 }
