@@ -1,14 +1,13 @@
 package com.ssafy.sse.controller;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,20 +37,44 @@ public class FileController {
 	private final S3UploadService s3UploadService;
 
 	@PostMapping("/summarize")
-	public ResponseEntity summarize(@RequestParam(value="input") String text){
-		String res = ocrService.sendSummarizeRequestToFlaskServer(text);
-		OcrResDto ocrResDto = OcrResDto.builder()
-			.result(res)
-			.build();
-		return ResponseEntity.ok(ocrResDto);
+	public ResponseEntity summarize(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image") MultipartFile image, @RequestParam(value="result") String result) throws IOException{
+		if(url.isPresent()){
+			File file = fileService.searchByUrl(String.valueOf(url));
+			return ResponseEntity.ok(file.getSummary());
+		}
+		else{
+			String sumResult = ocrService.sendSummarizeRequestToFlaskServer(result);
+			String transResult = ocrService.sendTranslateRequestToFlaskServer(result);
+			String s3Url = s3UploadService.saveFile(image);
+			FileDto fileDto = FileDto.builder()
+				.fileLocation(s3Url)
+				.result(result)
+				.summarizedResult(sumResult)
+				.translatedResult(transResult)
+				.build();
+			fileService.create(fileDto);
+			return ResponseEntity.ok(s3Url);
+		}
 	}
 	@PostMapping("/translate")
-	public ResponseEntity translate(@RequestParam(value="input") String text){
-		String res = ocrService.sendTranslateRequestToFlaskServer(text);
-		OcrResDto ocrResDto = OcrResDto.builder()
-			.result(res)
-			.build();
-		return ResponseEntity.ok(ocrResDto);
+	public ResponseEntity translate(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image" ) MultipartFile image, @RequestParam(value="result" ) String result) throws IOException{
+		if(url.isPresent()){
+			File file = fileService.searchByUrl(String.valueOf(url));
+			return ResponseEntity.ok(file.getTrans());
+		}
+		else {
+			String sumResult = ocrService.sendSummarizeRequestToFlaskServer(result);
+			String transResult = ocrService.sendTranslateRequestToFlaskServer(result);
+			String s3Url = s3UploadService.saveFile(image);
+			FileDto fileDto = FileDto.builder()
+				.fileLocation(s3Url)
+				.result(result)
+				.summarizedResult(sumResult)
+				.translatedResult(transResult)
+				.build();
+			fileService.create(fileDto);
+			return ResponseEntity.ok(s3Url);
+		}
 	}
 
 	@PostMapping("/url")
@@ -60,7 +83,7 @@ public class FileController {
 		return ResponseEntity.ok("ok");
 	}
 	@PostMapping("/predict")
-	public ResponseEntity predict(@RequestPart(value="image") MultipartFile image){
+	public ResponseEntity predict( @RequestPart(value="image") MultipartFile image){
 		// flask API 와 통신하여 결과 받아옴
 		String res = ocrService.sendPostRequestToFlaskServer(image);
 		OcrResDto ocrResDto = OcrResDto.builder()
@@ -70,15 +93,19 @@ public class FileController {
 		return ResponseEntity.ok(ocrResDto);
 	}
 	@PostMapping("/create")
-	public ResponseEntity create(@RequestParam(value="result") String result,
+	public ResponseEntity create(
+								@RequestParam(value="result") String result,
 								@RequestPart(value="image") MultipartFile image) throws IOException {
-		String s3Url = s3UploadService.saveFile(image);
-		FileDto fileDto = FileDto.builder()
-			.fileLocation(s3Url)
-			.result(result)
-			.build();
-		File file = fileService.create(fileDto);
-		return ResponseEntity.ok(file);
+			String s3Url = s3UploadService.saveFile(image);
+			FileDto fileDto = FileDto.builder()
+				.fileLocation(s3Url)
+				.result(result)
+				.summarizedResult("")
+				.translatedResult("")
+				.build();
+			fileService.create(fileDto);
+			return ResponseEntity.ok(s3Url);
+
 	}
 	@GetMapping()
 	public ResponseEntity getData(){
