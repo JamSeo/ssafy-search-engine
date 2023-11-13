@@ -30,7 +30,7 @@ public class FileService {
 			.result(fileDto.getResult())
 			.summary(fileDto.getSummarizedResult())
 			.trans(fileDto.getTranslatedResult())
-			.email("2@2")
+			.email(fileDto.getEmail())
 			.build();
 
 		return fileRepository.save(file);
@@ -38,7 +38,6 @@ public class FileService {
 
 	public List<FileResDto> searchAll(String email) {
 		List<File> fileList = fileRepository.findAllByEmail(email);
-		System.out.println(fileList.toString());
 		return getFileResDtos(fileList);
 	}
 
@@ -60,9 +59,9 @@ public class FileService {
 		return files;
 	}
 
-	public File searchByUrl(String url){
+	public File searchByUrl(String url, String email){
 		// 이메일 수정 필요
-		File file = fileRepository.findAllByUrl(url, "2@2");
+		File file = fileRepository.findAllByUrl(url, email);
 		return file;
 	}
 

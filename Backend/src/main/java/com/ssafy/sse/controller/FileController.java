@@ -4,15 +4,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import com.ssafy.sse.common.util.jwt.JwtUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sse.dto.FileDto;
@@ -35,11 +32,16 @@ public class FileController {
 	private final FileService fileService;
 	private final OcrService ocrService;
 	private final S3UploadService s3UploadService;
+	private final JwtUtil jwtUtil;
 
 	@PostMapping("/summarize")
-	public ResponseEntity summarize(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image") MultipartFile image, @RequestParam(value="result") String result) throws IOException{
+	public ResponseEntity summarize(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image") MultipartFile image, @RequestParam(value="result") String result, @RequestHeader HttpHeaders header) throws IOException{
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
 		if(url.isPresent()){
-			File file = fileService.searchByUrl(String.valueOf(url));
+			File file = fileService.searchByUrl(String.valueOf(url), email);
 			return ResponseEntity.ok(file.getSummary());
 		}
 		else{
@@ -51,15 +53,20 @@ public class FileController {
 				.result(result)
 				.summarizedResult(sumResult)
 				.translatedResult(transResult)
+				.email(email)
 				.build();
 			fileService.create(fileDto);
 			return ResponseEntity.ok(s3Url);
 		}
 	}
 	@PostMapping("/translate")
-	public ResponseEntity translate(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image" ) MultipartFile image, @RequestParam(value="result" ) String result) throws IOException{
+	public ResponseEntity translate(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image" ) MultipartFile image, @RequestParam(value="result" ) String result, @RequestHeader HttpHeaders header) throws IOException{
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
 		if(url.isPresent()){
-			File file = fileService.searchByUrl(String.valueOf(url));
+			File file = fileService.searchByUrl(String.valueOf(url),email);
 			return ResponseEntity.ok(file.getTrans());
 		}
 		else {
@@ -71,6 +78,7 @@ public class FileController {
 				.result(result)
 				.summarizedResult(sumResult)
 				.translatedResult(transResult)
+				.email(email)
 				.build();
 			fileService.create(fileDto);
 			return ResponseEntity.ok(s3Url);
@@ -95,30 +103,46 @@ public class FileController {
 	@PostMapping("/create")
 	public ResponseEntity create(
 								@RequestParam(value="result") String result,
-								@RequestPart(value="image") MultipartFile image) throws IOException {
-			String s3Url = s3UploadService.saveFile(image);
-			FileDto fileDto = FileDto.builder()
-				.fileLocation(s3Url)
-				.result(result)
-				.summarizedResult("")
-				.translatedResult("")
-				.build();
-			fileService.create(fileDto);
-			return ResponseEntity.ok(s3Url);
+								@RequestPart(value="image") MultipartFile image,@RequestHeader HttpHeaders header) throws IOException {
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
+
+		String s3Url = s3UploadService.saveFile(image);
+		FileDto fileDto = FileDto.builder()
+			.fileLocation(s3Url)
+			.result(result)
+			.summarizedResult("")
+			.translatedResult("")
+			.email(email)
+			.build();
+		fileService.create(fileDto);
+		return ResponseEntity.ok(s3Url);
 
 	}
 	@GetMapping()
-	public ResponseEntity getData(){
+	public ResponseEntity getData(@RequestHeader HttpHeaders header){
 		// 이메일 수정 필요
-		List<FileResDto> fileList = fileService.searchAll("2@2");
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
+
+		List<FileResDto> fileList = fileService.searchAll(email);
 		return ResponseEntity.ok(fileList);
 	}
 	@GetMapping("/date")
 	public ResponseEntity getDataByDate(
 		@DateTimeFormat(pattern = "yyyy-MM-dd")
-		@RequestParam(value="date") String date){
+		@RequestParam(value="date") String date, @RequestHeader HttpHeaders header){
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
+
 		// 이메일 수정 필요
-		List<FileResDto> fileList = fileService.searchByDate(date,"2@2");
+		List<FileResDto> fileList = fileService.searchByDate(date,email);
 		return ResponseEntity.ok(fileList);
 	}
 
@@ -127,9 +151,15 @@ public class FileController {
 		@DateTimeFormat(pattern = "yyyy-MM-dd")
 		@RequestParam(value="start") String start,
 		@DateTimeFormat(pattern = "yyyy-MM-dd")
-		@RequestParam(value="end") String end){
+		@RequestParam(value="end") String end, @RequestHeader HttpHeaders header){
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
+
+
 		// 이메일 수정 필요
-		List<FileResDto> fileList = fileService.searchByDateBetween(start, end,"2@2");
+		List<FileResDto> fileList = fileService.searchByDateBetween(start, end, email);
 		return ResponseEntity.ok(fileList);
 	}
 }

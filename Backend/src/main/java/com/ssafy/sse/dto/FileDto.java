@@ -12,4 +12,5 @@ public class FileDto {
 	private String translatedResult;
 	private String summarizedResult;
 	private String result;
+	private String email;
 }
