@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sse.dto.CreateResDto;
 import com.ssafy.sse.dto.FileDto;
 import com.ssafy.sse.dto.FileResDto;
 import com.ssafy.sse.dto.OcrResDto;
@@ -127,9 +128,12 @@ public class FileController {
 			.translatedResult("")
 			.email(email)
 			.build();
-		fileService.create(fileDto);
-		return ResponseEntity.ok(s3Url);
-
+		File file = fileService.create(fileDto);
+		CreateResDto createResDto = CreateResDto.builder()
+			.url(file.getFileLocation())
+			.build();
+		System.out.println(file.getFileLocation());
+		return ResponseEntity.ok(createResDto);
 	}
 	@GetMapping()
 	public ResponseEntity getData(@RequestHeader HttpHeaders header){
