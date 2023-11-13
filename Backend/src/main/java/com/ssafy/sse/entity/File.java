@@ -42,6 +42,12 @@ public class File {
 	@Column(name="result")
 	private String result;
 
+	@Column(name="summarized_result")
+	private String summary;
+
+	@Column(name="translated_result")
+	private String trans;
+
 	@Column(name="email")
 	private String email;
 
