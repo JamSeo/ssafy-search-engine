@@ -24,8 +24,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // OCR 결과 popup에 띄우기
   if (message.action === 'ocrResponseData') {
-    const { data, popupId } = message;
-    console.log("OCR 결과: ", data);
-    window.popupUtils.updatePopup(popupId, data);
+    const { ocrResponseData, popupId, capturedImageUrl } = message;
+    console.log("OCR 결과: ", ocrResponseData);
+    window.popupUtils.updatePopup(popupId, ocrResponseData, capturedImageUrl);
   }
 });

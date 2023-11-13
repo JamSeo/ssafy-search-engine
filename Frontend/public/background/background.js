@@ -3,10 +3,24 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 브라우저 캡처 요청
   if (message.action === 'activateCaptureMode') {
-    console.log("[background.js] 메시지 요청 내용: 'activateCaptureMode'")
+    console.log("[background.js] 메시지 요청 내용: 'activateCaptureMode'");
     const { tabId, action } = message;
     chrome.tabs.sendMessage(tabId, { tabId, action }, (response) => {
       handleCaptureAreaData(response);
+    });
+  }
+
+  // OCR 결과 저장 요청
+  if (message.action === "saveOcrResult") {
+    console.log("[background.js] 메시지 요청 내용: 'saveOcrResult'");
+    chrome.storage.local.get(["accessToken"], (res) => {
+      if (!res.accessToken) {
+        alert("로그인 후 사용해주세요");
+        chrome.runtime.sendMessage({ action: "activateAuthMode" });
+      } else {
+        const accessToken = res.accessToken;
+        fetchData(accessToken, message);
+      }
     });
   }
 
@@ -59,12 +73,48 @@ const handleCaptureAreaData = async (message, sender, sendResponse) => {
 
     // [3] 반환된 결과 content-script로 전송
     console.log("[background.js/handleCaptureAreaData] OCR 결과를 브라우저로 전송")
-    chrome.tabs.sendMessage(tabId, { action: "ocrResponseData", data: ocrResponseData, popupId });
+    chrome.tabs.sendMessage(tabId, {
+      action: "ocrResponseData",
+      ocrResponseData,
+      popupId,
+      capturedImageUrl,
+    });
     return;
   } catch (error) {
     console.error("[background.js/handleCaptureAreaData] 전송 실패", error);
   }
 };
+
+
+const fetchData = async (accessToken, { ocrResponseData, capturedImageUrl }) => {
+  const OCR_SAVE_URL = "http://k9a708.p.ssafy.io:8081/ocr/create";
+
+  try {
+    const response = await fetch(capturedImageUrl);
+    const blob = await response.blob();
+    const formData = new FormData();
+    formData.append("image", blob, "image.jpeg");
+    formData.append("result", ocrResponseData);
+
+    // OCR API에 POST 요청
+    console.log("[background.js/fetchData] OCR 데이터 저장 요청")
+    const ocrResponse = await fetch(OCR_SAVE_URL, {
+      method: "POST",
+      headers: {
+        "accessToken": accessToken,
+      },
+      body: formData,
+    });
+
+    const data = await ocrResponse.json();
+    console.log("[background.js/fetchData] 메시지 반환 내용", data.result);
+    return data.result;
+  }
+  catch (error) {
+    console.log("[background.js/fetchData] 메시지 전송 실패", error);
+    throw error;
+  }
+}
 
 /** 반환된 좌표를 이용해서 캡쳐 이미지를 그리는 함수 */
 const parsingCaptureData = (tabId, captureAreaData) => {

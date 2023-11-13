@@ -8,4 +8,4 @@ const serverApi: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-export { serverApi };
+export { serverApi, REACT_APP_SERVER };
