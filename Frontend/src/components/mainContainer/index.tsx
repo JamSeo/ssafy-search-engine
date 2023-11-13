@@ -1,8 +1,7 @@
 import * as S from "./MainContainer.style";
 
 import ImageToolTab from "../imageToolTab";
-import ResultTab from "../resultTab";
-import History from "../historyTab";
+import SigninTab from "../historyTab";
 
 import { Tabs, Tab, TabList, TabPanel } from "@mui/joy";
 import { tabClasses } from "@mui/joy/Tab";
@@ -38,9 +37,6 @@ const MainContainer: React.FC = () => {
               <TbTextRecognition size={20} />
             </Tab>
             <Tab disableIndicator>
-              <TbFileTextAi size={20} />
-            </Tab>
-            <Tab disableIndicator>
               <TbHistory size={20} />
             </Tab>
           </TabList>
@@ -56,10 +52,7 @@ const MainContainer: React.FC = () => {
             <ImageToolTab />
           </TabPanel>
           <TabPanel value={1}>
-            <ResultTab />
-          </TabPanel>
-          <TabPanel value={2}>
-            <History />
+            <SigninTab />
           </TabPanel>
         </S.TabPanelContainer>
       </Tabs>
