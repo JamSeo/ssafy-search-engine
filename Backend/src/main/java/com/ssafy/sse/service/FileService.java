@@ -28,6 +28,8 @@ public class FileService {
 		File file = File.builder()
 			.fileLocation(fileDto.getFileLocation())
 			.result(fileDto.getResult())
+			.summary(fileDto.getSummarizedResult())
+			.trans(fileDto.getTranslatedResult())
 			.email("2@2")
 			.build();
 
@@ -56,6 +58,12 @@ public class FileService {
 			files.add(fileResDto);
 		}
 		return files;
+	}
+
+	public File searchByUrl(String url){
+		// 이메일 수정 필요
+		File file = fileRepository.findAllByUrl(url, "2@2");
+		return file;
 	}
 
 	public List<FileResDto> searchByDateBetween(String start, String end, String email){
