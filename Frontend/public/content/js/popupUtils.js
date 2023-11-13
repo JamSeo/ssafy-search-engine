@@ -65,7 +65,7 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
   // 저장 버튼 추가
   const saveButton = document.createElement("button");
   saveButton.classList.add("sse-popup-button");
-  saveButton.classList.add("sse-copy-button");
+  saveButton.classList.add("sse-save-button");
   saveButton.textContent = "Save";
   saveButton.onclick = () => {
     console.log("[popupUtils.js/updatePopup] 서버에 저장 요청", ocrResponseData, capturedImageUrl);

@@ -1,4 +1,4 @@
-import { serverApi } from "../../../utils/serverApi";
+import { createServerApi } from "../../../utils/serverApi";
 import { IhandleCaptureData } from "../../../interface/ImageCaptureButton";
 
 // 원하는 영역과 크기로 이미지를 그리는 함수
@@ -105,6 +105,7 @@ const sendImageToOcrApi = async (imageUrl: string) => {
     formData.append("image", blob, "image.png");
 
     // OCR API에 POST 요청
+    const serverApi = await createServerApi();
     const ocrResponse = await serverApi.post("/ocr/predict", formData);
     return ocrResponse.data;
   } catch (error) {

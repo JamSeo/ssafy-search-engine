@@ -7,22 +7,28 @@ const SigninTab: React.FC = () => {
 
   useEffect(() => {
     const checkAccessToken = async () => {
-      const result = await new Promise<{ accessToken?: string }>(
-        (resolve, reject) => {
-          chrome.storage.local.get(["accessToken"], (res) => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve(res as { accessToken?: string });
-            }
-          });
-        }
-      );
+      const result = await new Promise<{ accessToken?: string }>((resolve) => {
+        chrome.storage.local.get(["accessToken"], (res) => {
+          resolve(res as { accessToken?: string });
+        });
+      });
 
       setIsAuthOpen(!!result.accessToken);
     };
 
     checkAccessToken();
+
+    // 스토리지 변경 감지 리스너
+    const onStorageChange = (changes: any, area: any) => {
+      if (area === "local" && changes.accessToken) {
+        setIsAuthOpen(!!changes.accessToken.newValue);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(onStorageChange);
+    return () => {
+      chrome.storage.onChanged.removeListener(onStorageChange);
+    };
   }, []);
 
   return isAuthOpen ? <HistoryTab /> : <SigninButton />;
