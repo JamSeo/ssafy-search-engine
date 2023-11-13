@@ -15,6 +15,10 @@ import com.ssafy.sse.entity.File;
 @Repository
 @Transactional
 public interface FileRepository extends JpaRepository<File, Long> {
+
+	@Query(value = "SELECT * from file where file_location = :url and email = :email order by createDate desc", nativeQuery = true)
+	File findAllByUrl(String url, String email);
+
 	@Query(value = "SELECT * from file where email = :email order by createDate desc", nativeQuery = true)
 	List<File> findAllByEmail(String email);
 
