@@ -20,6 +20,8 @@
     "@types/react-dom": "^18.2.14",
     "@types/styled-components": "^5.1.29",
     "axios": "^1.5.1",
+    "gapi-script": "^1.2.0",
+    "google-api-client": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0",
