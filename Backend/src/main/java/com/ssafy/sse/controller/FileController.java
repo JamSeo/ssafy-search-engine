@@ -34,6 +34,16 @@ public class FileController {
 	private final S3UploadService s3UploadService;
 	private final JwtUtil jwtUtil;
 
+	@PostMapping("/delete")
+	public ResponseEntity delete(@RequestParam(name="url") String url, @RequestHeader HttpHeaders header){
+		String accessToken = header.getFirst("accessToken");
+		log.info("Token : {}",accessToken);
+		String email = jwtUtil.getUid(accessToken);
+		log.info("User Email : {}",email);
+
+		int res = fileService.deleteByUrl(url, email);
+		return ResponseEntity.ok(res);
+	}
 	@PostMapping("/summarize")
 	public ResponseEntity summarize(@RequestParam(name="url") Optional<String> url, @RequestPart(value="image") MultipartFile image, @RequestParam(value="result") String result, @RequestHeader HttpHeaders header) throws IOException{
 		String accessToken = header.getFirst("accessToken");

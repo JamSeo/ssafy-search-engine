@@ -59,6 +59,11 @@ public class FileService {
 		return files;
 	}
 
+	public int deleteByUrl(String url, String email){
+		int res = fileRepository.deleteByUrl(url, email);
+		return res;
+	}
+
 	public File searchByUrl(String url, String email){
 		// 이메일 수정 필요
 		File file = fileRepository.findAllByUrl(url, email);
