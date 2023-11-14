@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sse.dto.CreateReqDto;
 import com.ssafy.sse.dto.CreateResDto;
 import com.ssafy.sse.dto.FileDto;
 import com.ssafy.sse.dto.FileResDto;
@@ -99,8 +100,8 @@ public class FileController {
 	}
 
 	@PostMapping("/url")
-	public ResponseEntity getOcrUrl(@RequestParam(value="url") String url){
-		ocrService.saveUrl(url);
+	public ResponseEntity getOcrUrl(@RequestBody UrlReqDto urlReqDto){
+		ocrService.saveUrl(urlReqDto.getUrl());
 		return ResponseEntity.ok("ok");
 	}
 	@PostMapping("/predict")
@@ -115,17 +116,16 @@ public class FileController {
 	}
 	@PostMapping("/create")
 	public ResponseEntity create(
-								@RequestParam(value="result") String result,
-								@RequestPart(value="image") MultipartFile image,@RequestHeader HttpHeaders header) throws IOException {
+								@RequestPart CreateReqDto createReqDto,@RequestHeader HttpHeaders header) throws IOException {
 		String accessToken = header.getFirst("accessToken");
 		log.info("Token : {}",accessToken);
 		String email = jwtUtil.getUid(accessToken);
 		log.info("User Email : {}",email);
 
-		String s3Url = s3UploadService.saveFile(image);
+		String s3Url = s3UploadService.saveFile(createReqDto.getImage());
 		FileDto fileDto = FileDto.builder()
 			.fileLocation(s3Url)
-			.result(result)
+			.result(createReqDto.getResult())
 			.summarizedResult("")
 			.translatedResult("")
 			.email(email)
