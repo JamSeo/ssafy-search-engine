@@ -2,66 +2,66 @@
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 브라우저 캡처 요청
-  if (message.action === 'activateCaptureMode') {
+  if (message.action === "activateCaptureMode") {
     console.log("[background.js] 메시지 요청 내용: 'activateCaptureMode'");
+
     const { tabId, action } = message;
     chrome.tabs.sendMessage(tabId, { tabId, action }, (response) => {
       handleCaptureAreaData(response);
     });
   }
 
+  // 업로드 이미지 분석 요청
+  if (message.action === "analyzeUploadImage") {
+    console.log("[background.js] 메시지 요청 내용: 'analyzeUploadImage'");
+
+    const { tabId, uploadImageUrl } = message;
+    const popupId = "" + tabId + uploadImageUrl.substring(0, 10);
+    chrome.tabs.sendMessage(tabId, {
+      action: "analyzeUploadImage",
+      popupId,
+    });
+
+    handleUploadImageData({ tabId, uploadImageUrl, popupId });
+  }
+
   // OCR 결과 저장 요청
   if (message.action === "saveOcrResult") {
     console.log("[background.js] 메시지 요청 내용: 'saveOcrResult'");
-    chrome.storage.local.get(["accessToken"], (res) => {
-      if (!res.accessToken) {
-        alert("로그인 후 사용해주세요");
-        chrome.runtime.sendMessage({ action: "activateAuthMode" });
-      } else {
-        const accessToken = res.accessToken;
-        fetchData(accessToken, message);
+
+    chrome.storage.local.get(["accessToken"], async (res) => {
+      let accessToken = res.accessToken;
+
+      if (!accessToken) {
+        accessToken = await requestAuthorization();
       }
+
+      accessToken && requestSaveData(accessToken, message);
     });
   }
 
   // 로그인 요청
   if (message.action === "activateAuthMode") {
-    chrome.windows.create(
-      {
-        url: "http://k9a708.p.ssafy.io:8081/swagger-ui/index.html#/",
-        type: "popup",
-      },
-      (popupWindow) => {
-        // 팝업이 열린 후에 URL에서 코드를 찾아 저장하고 팝업을 닫음
-        chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-          if (
-            tabId === popupWindow.tabs[0].id &&
-            changeInfo.status === "complete"
-          ) {
-            chrome.tabs.get(tabId, (currentTab) => {
-              const currentURL = currentTab.url;
-              const url = new URL(currentURL);
-              const accessToken = url.searchParams.get("code");
-              console.log("[background.js] accessToken", accessToken);
+    console.log("[background.js] 메시지 요청 내용: 'activateAuthMode'");
 
-              if (accessToken.length > 0) {
-                // loacal storage에 AccessToken 저장
-                chrome.storage.local.set({ "accessToken": accessToken }, () => {
-                  console.log("[background.js] AccessToken is saved");
-                });
-                chrome.windows.remove(popupWindow.id); // 팝업 닫기
-              }
-            });
-          }
-        });
-      }
-    );
+    requestAuthorization();
+  }
+
+  // HistoryData 보여주기 요청
+  if (message.action === "displayHistoryData") {
+    console.log("[background.js] 메시지 요청 내용: 'displayHistoryData'");
+
+    const { action, historyData } = message;
+    chrome.tabs.query({ active: true }, (tabs) => {
+      const activeTab = tabs[0];
+      chrome.tabs.sendMessage(activeTab.id, { action, historyData });
+    });
   }
 });
 
 
 /** 캡쳐 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
-const handleCaptureAreaData = async (message, sender, sendResponse) => {
+const handleCaptureAreaData = async (message) => {
   try {
     const { tabId, captureAreaData, popupId } = message;
 
@@ -85,32 +85,87 @@ const handleCaptureAreaData = async (message, sender, sendResponse) => {
   }
 };
 
+/** 업로드 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
+const handleUploadImageData = async ({ tabId, uploadImageUrl, popupId }) => {
+  try {
+    // [1] upload된 이미지 OCR 서버로 전송
+    const ocrResponseData = await sendImageToOcrApi(uploadImageUrl);
 
-const fetchData = async (accessToken, { ocrResponseData, capturedImageUrl }) => {
+    // [2] 반환된 결과 content-script로 전송
+    console.log("[background.js/handleUploadImageData] 업로드 이미지 분석 결과를 브라우저로 전송", ocrResponseData)
+    chrome.tabs.sendMessage(tabId, {
+      action: "analyzeUploadImage",
+      popupId,
+      ocrResponseData,
+      uploadImageUrl,
+    });
+    return;
+  } catch (error) {
+    console.error("[background.js/handleCaptureAreaData] 전송 실패", error);
+  }
+};
+
+/** 구글 O-AUTH 요청하는 함수 */
+const requestAuthorization = () => {
+  return new Promise((resolve, reject) => {
+    chrome.windows.create(
+      {
+        url: "http://k9a708.p.ssafy.io:8081/swagger-ui/index.html#/",
+        type: "popup",
+      },
+      (popupWindow) => {
+        // 팝업이 열린 후에 URL에서 코드를 찾아 저장하고 팝업을 닫음
+        chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
+          if (
+            tabId === popupWindow.tabs[0].id &&
+            changeInfo.status === "complete"
+          ) {
+            chrome.tabs.get(tabId, (currentTab) => {
+              const currentURL = currentTab.url;
+              const url = new URL(currentURL);
+              const accessToken = url.searchParams.get("code");
+
+              // loacal storage에 AccessToken 저장
+              if (accessToken) {
+                chrome.storage.local.set({ accessToken }, () => {
+                  console.log("[background.js] AccessToken is saved");
+                });
+                chrome.windows.remove(popupWindow.id); // 팝업 닫기
+                chrome.tabs.onUpdated.removeListener(listener);
+                resolve(accessToken);
+              }
+            });
+          }
+        });
+      }
+    );
+  });
+}
+
+/** OCR 데이터 저장 요청하는 함수 */
+const requestSaveData = async (accessToken, { ocrResponseData, capturedImageUrl }) => {
   const OCR_SAVE_URL = "http://k9a708.p.ssafy.io:8081/ocr/create";
 
   try {
-    const response = await fetch(capturedImageUrl);
-    const blob = await response.blob();
+    const imageUrl = await fetch(capturedImageUrl);
+    const blob = await imageUrl.blob();
     const formData = new FormData();
     formData.append("image", blob, "image.jpeg");
     formData.append("result", ocrResponseData);
 
     // OCR API에 POST 요청
     console.log("[background.js/fetchData] OCR 데이터 저장 요청")
-    const ocrResponse = await fetch(OCR_SAVE_URL, {
+    const response = await fetch(OCR_SAVE_URL, {
       method: "POST",
-      headers: {
-        "accessToken": accessToken,
-      },
       body: formData,
+      headers: { accessToken },
     });
 
-    const data = await ocrResponse.json();
-    console.log("[background.js/fetchData] 메시지 반환 내용", data.result);
-    return data.result;
-  }
-  catch (error) {
+    const data = await response.json();
+    console.log("[background.js/fetchData] 메시지 반환 내용", data.url);
+
+    chrome.runtime.sendMessage({ action: "fetchHistoryData" });
+  } catch (error) {
     console.log("[background.js/fetchData] 메시지 전송 실패", error);
     throw error;
   }
@@ -146,7 +201,7 @@ const parsingCaptureData = (tabId, captureAreaData) => {
           });
       });
     } catch (error) {
-      console.log(error);
+      console.log("[background.js/parsingCaptureData] 메시지 전송 실패", error);
       reject(error);
     }
   })

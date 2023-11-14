@@ -50,6 +50,15 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
 
   const buttonContainer = popupContainer.querySelector(".sse-button-container");
 
+  // 기존 버튼과 텍스트 삭제
+  if (buttonContainer) {
+    const copyButton = buttonContainer.querySelector(".sse-copy-button");
+    const saveButton = buttonContainer.querySelector(".sse-save-button");
+    copyButton?.remove();
+    saveButton?.remove();
+  }
+  const existingText = popupContainer.querySelector(".sse-ocr-text");
+  existingText?.remove();
 
   // 복사 버튼 추가
   const copyButton = document.createElement("button");
@@ -65,7 +74,7 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
   // 저장 버튼 추가
   const saveButton = document.createElement("button");
   saveButton.classList.add("sse-popup-button");
-  saveButton.classList.add("sse-copy-button");
+  saveButton.classList.add("sse-save-button");
   saveButton.textContent = "Save";
   saveButton.onclick = () => {
     console.log("[popupUtils.js/updatePopup] 서버에 저장 요청", ocrResponseData, capturedImageUrl);

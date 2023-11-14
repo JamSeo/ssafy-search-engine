@@ -1,5 +1,5 @@
 import * as S from "./ImageCaptureButton.style";
-import { getActiveTab } from "./ImageCaptureFunc";
+import { getActiveTab } from "../getActiveTab";
 import { TbPhotoSensor } from "react-icons/tb";
 
 const ImageCaptureButton: React.FC = () => {

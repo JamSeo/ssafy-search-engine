@@ -14,7 +14,7 @@ const SigninContainer = styled.div`
 const GoogleSignInButton = styled.button`
   background-color: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   padding: 0;
   display: flex;
