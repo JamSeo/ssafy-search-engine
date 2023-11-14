@@ -29,7 +29,5 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
 	@Query(value = "UPDATE url o SET o.dest = :dest where o.id = 1", nativeQuery = true)
 	int updateDest(@Param(value="dest") String dest);
-
-	@Query(value = "DELETE from file where email = :email and file_location = :url", nativeQuery =true)
-	int deleteByUrl(String url, String email);
+	int deleteAllByEmailAndFileLocation(String email, String fileLocation);
 }
