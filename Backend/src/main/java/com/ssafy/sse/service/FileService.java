@@ -60,7 +60,7 @@ public class FileService {
 	}
 
 	public int deleteByUrl(String url, String email){
-		int res = fileRepository.deleteByUrl(url, email);
+		int res = fileRepository.deleteAllByEmailAndFileLocation(email,url);
 		return res;
 	}
 
