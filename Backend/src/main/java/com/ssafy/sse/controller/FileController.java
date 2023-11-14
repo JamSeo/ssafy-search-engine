@@ -44,7 +44,6 @@ public class FileController {
 		log.info("Token : {}",accessToken);
 		String email = jwtUtil.getUid(accessToken);
 		log.info("User Email : {}",email);
-
 		int res = fileService.deleteByUrl(urlReq.getUrl(), email);
 		return ResponseEntity.ok(res);
 	}
@@ -116,16 +115,17 @@ public class FileController {
 	}
 	@PostMapping("/create")
 	public ResponseEntity create(
-								@RequestPart CreateReqDto createReqDto,@RequestHeader HttpHeaders header) throws IOException {
+		@RequestPart(name = "image") MultipartFile image,
+		@RequestPart(name = "result") String result,@RequestHeader HttpHeaders header) throws IOException {
 		String accessToken = header.getFirst("accessToken");
 		log.info("Token : {}",accessToken);
 		String email = jwtUtil.getUid(accessToken);
 		log.info("User Email : {}",email);
 
-		String s3Url = s3UploadService.saveFile(createReqDto.getImage());
+		String s3Url = s3UploadService.saveFile(image);
 		FileDto fileDto = FileDto.builder()
 			.fileLocation(s3Url)
-			.result(createReqDto.getResult())
+			.result(result)
 			.summarizedResult("")
 			.translatedResult("")
 			.email(email)
