@@ -2,13 +2,27 @@
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 브라우저 캡처 요청
-  if (message.action === 'activateCaptureMode') {
+  if (message.action === "activateCaptureMode") {
     console.log("[background.js] 메시지 요청 내용: 'activateCaptureMode'");
 
     const { tabId, action } = message;
     chrome.tabs.sendMessage(tabId, { tabId, action }, (response) => {
       handleCaptureAreaData(response);
     });
+  }
+
+  // 업로드 이미지 분석 요청
+  if (message.action === "analyzeUploadImage") {
+    console.log("[background.js] 메시지 요청 내용: 'analyzeUploadImage'");
+
+    const { tabId, uploadImageUrl } = message;
+    const popupId = "" + tabId + uploadImageUrl.substring(0, 10);
+    chrome.tabs.sendMessage(tabId, {
+      action: "analyzeUploadImage",
+      popupId,
+    });
+
+    handleUploadImageData({ tabId, uploadImageUrl, popupId });
   }
 
   // OCR 결과 저장 요청
@@ -32,11 +46,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     requestAuthorization();
   }
+
+  // HistoryData 보여주기 요청
+  if (message.action === "displayHistoryData") {
+    console.log("[background.js] 메시지 요청 내용: 'displayHistoryData'");
+
+    const { action, historyData } = message;
+    chrome.tabs.query({ active: true }, (tabs) => {
+      const activeTab = tabs[0];
+      chrome.tabs.sendMessage(activeTab.id, { action, historyData });
+    });
+  }
 });
 
 
 /** 캡쳐 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
-const handleCaptureAreaData = async (message, sender, sendResponse) => {
+const handleCaptureAreaData = async (message) => {
   try {
     const { tabId, captureAreaData, popupId } = message;
 
@@ -53,6 +78,26 @@ const handleCaptureAreaData = async (message, sender, sendResponse) => {
       ocrResponseData,
       popupId,
       capturedImageUrl,
+    });
+    return;
+  } catch (error) {
+    console.error("[background.js/handleCaptureAreaData] 전송 실패", error);
+  }
+};
+
+/** 업로드 이미지를 pasring하고 OCR 서버로 전송하는 함수 */
+const handleUploadImageData = async ({ tabId, uploadImageUrl, popupId }) => {
+  try {
+    // [1] upload된 이미지 OCR 서버로 전송
+    const ocrResponseData = await sendImageToOcrApi(uploadImageUrl);
+
+    // [2] 반환된 결과 content-script로 전송
+    console.log("[background.js/handleUploadImageData] 업로드 이미지 분석 결과를 브라우저로 전송", ocrResponseData)
+    chrome.tabs.sendMessage(tabId, {
+      action: "analyzeUploadImage",
+      popupId,
+      ocrResponseData,
+      uploadImageUrl,
     });
     return;
   } catch (error) {
@@ -118,6 +163,8 @@ const requestSaveData = async (accessToken, { ocrResponseData, capturedImageUrl 
 
     const data = await response.json();
     console.log("[background.js/fetchData] 메시지 반환 내용", data.url);
+
+    chrome.runtime.sendMessage({ action: "fetchHistoryData" });
   } catch (error) {
     console.log("[background.js/fetchData] 메시지 전송 실패", error);
     throw error;
@@ -154,7 +201,7 @@ const parsingCaptureData = (tabId, captureAreaData) => {
           });
       });
     } catch (error) {
-      console.log(error);
+      console.log("[background.js/parsingCaptureData] 메시지 전송 실패", error);
       reject(error);
     }
   })

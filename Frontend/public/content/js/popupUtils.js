@@ -50,6 +50,15 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
 
   const buttonContainer = popupContainer.querySelector(".sse-button-container");
 
+  // 기존 버튼과 텍스트 삭제
+  if (buttonContainer) {
+    const copyButton = buttonContainer.querySelector(".sse-copy-button");
+    const saveButton = buttonContainer.querySelector(".sse-save-button");
+    copyButton?.remove();
+    saveButton?.remove();
+  }
+  const existingText = popupContainer.querySelector(".sse-ocr-text");
+  existingText?.remove();
 
   // 복사 버튼 추가
   const copyButton = document.createElement("button");
