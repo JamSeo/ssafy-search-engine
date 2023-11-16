@@ -36,6 +36,7 @@ const createPopup = (popupId) => {
   const popupContext = document.createElement("div");
   popupContext.classList.add("sse-popup-context");
   popupContext.classList.add("blinking-cursor");
+  popupContext.textContent = "|";
   popupContainer.appendChild(popupContext);
 
   // 팝업 컨테이너를 body에 추가
@@ -87,18 +88,17 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
   buttonContainer.insertBefore(saveButton, buttonContainer.firstChild);
 
   // 깜빡이는 커서 효과 제거
-  const popupContext = document.querySelector(".sse-popup-context");
-  if (popupContext) {
-    popupContext.classList.remove("blinking-cursor");
-    popupContext.remove();
-  }
+  const popupContext = popupContainer.querySelector(".sse-popup-context");
+  popupContext.classList.remove("blinking-cursor");
+  popupContext.textContent = "";
 
   // 텍스트 추가
-  const ocrResultText = document.createElement("div");
-  ocrResultText.classList.add("sse-ocr-text");
-  popupContainer.appendChild(ocrResultText);
-  if (ocrResponseData) {
-    typeText(ocrResultText, ocrResponseData, 0, 20);
+  popupContext.classList.add("sse-ocr-text");
+  if (!ocrResponseData) {
+    const errorMessage = "An error has occurred. Please try again later.";
+    typeText(popupContext, errorMessage, 0, 10);
+  } else {
+    typeText(popupContext, ocrResponseData, 0, 10);
   }
 }
 

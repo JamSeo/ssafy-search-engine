@@ -20,6 +20,7 @@ const HistoryTabItem: React.FC<IHistoryTabItem> = ({
     try {
       const serverApi = await createServerApi();
       console.log("[popup.js/HistoryTabItem] 삭제 요청");
+
       const response = await serverApi.post("/ocr/delete", {
         url: fileLocation,
       });
@@ -36,7 +37,7 @@ const HistoryTabItem: React.FC<IHistoryTabItem> = ({
     requestDeleteData();
   };
 
-  const displayHistoryData = () => {
+  const requestDisplayData = () => {
     console.log(
       "[popup.js/HistoryTabItem] background로 historyData 보여주기 요청"
     );
@@ -48,7 +49,7 @@ const HistoryTabItem: React.FC<IHistoryTabItem> = ({
   };
 
   return (
-    <S.HistoryTabItem onDoubleClick={displayHistoryData}>
+    <S.HistoryTabItem onDoubleClick={requestDisplayData}>
       <LuMessageSquare className="messageIcon" />
       <div className="title">{title}</div>
       <LuTrash2 className="trashIcon" onClick={handleDelete} />

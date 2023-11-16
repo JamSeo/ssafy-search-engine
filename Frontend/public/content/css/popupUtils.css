@@ -80,8 +80,9 @@
 .sse-ocr-text {
   color: #333;
   font-size: 14px;
+  line-height: 1.5;
   overflow-y: auto;
-  height: 132px;
+  height: 163px;
 }
 
 .sse-ocr-text::-webkit-scrollbar {
@@ -95,16 +96,11 @@
 
 /* 추가된 깜빡이는 커서 효과 */
 .blinking-cursor {
-  border-right: 2px solid #333; /* 커서처럼 보이는 세로선 */
-  padding-right: 5px; /* 커서와 텍스트 사이 간격 */
-  margin-right: 5px; /* 커서와 컨테이너 오른쪽 사이 간격 */
-  white-space: nowrap; /* 줄바꿈 방지 */
-  overflow: hidden; /* 내용이 넘칠 경우 숨김 */
-  animation: blink-animation 1s steps(1) infinite; /* 깜빡임 애니메이션 */
+  animation: blink-effect 1s step-end infinite;
 }
 
-@keyframes blink-animation {
+@keyframes blink-effect {
   50% {
-    border-color: transparent; /* 50%의 시간 동안 투명하게 만들어 깜빡임 효과 생성 */
+    opacity: 0;
   }
 }
