@@ -90,7 +90,7 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
   // 깜빡이는 커서 효과 제거
   const popupContext = popupContainer.querySelector(".sse-popup-context");
   popupContext.classList.remove("blinking-cursor");
-  popupContext.textContent = "";
+  popupContext.innerHTML = "";
 
   // 텍스트 추가
   popupContext.classList.add("sse-ocr-text");
@@ -98,15 +98,22 @@ const updatePopup = (popupId, ocrResponseData, capturedImageUrl) => {
     const errorMessage = "An error has occurred. Please try again later.";
     typeText(popupContext, errorMessage, 0, 10);
   } else {
-    typeText(popupContext, ocrResponseData, 0, 10);
+    const splitText = ocrResponseData.split('•').join('\n');
+    typeText(popupContext, splitText, 0, 10);
   }
 }
 
 /** 타이핑 효과를 위한 함수 */
 const typeText = (textElement, text, index, interval) => {
   if (index < text.length) {
-    textElement.textContent += text[index++];
-    setTimeout(() => typeText(textElement, text, index, interval), interval);
+    if (text[index] === '\n') {
+      // 줄바꿈 문자를 만나면 <br> 태그 추가
+      textElement.innerHTML += '<br>';
+    } else {
+      // 기존 텍스트에 문자 추가
+      textElement.innerHTML += text[index];
+    }
+    setTimeout(() => typeText(textElement, text, index + 1, interval), interval);
   }
 }
 

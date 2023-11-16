@@ -5,6 +5,10 @@ import { TbPhotoSensor } from "react-icons/tb";
 const ImageCaptureButton: React.FC = () => {
   const handleCaptureClick = async () => {
     const currentTab = await getActiveTab();
+    if (!currentTab || typeof currentTab.id !== "number") {
+      console.error("No active tab found or tab ID is undefined.");
+      return;
+    }
     chrome.runtime.sendMessage({
       action: "activateCaptureMode",
       tabId: currentTab?.id,
