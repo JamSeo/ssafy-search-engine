@@ -1,0 +1,106 @@
+.sse-popup-container {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 370px;
+  height: 200px;
+  background-color: #f7ede2;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 16px;
+  border-radius: 5px;
+}
+
+.sse-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* SSE 텍스트 스타일 */
+.sse-popup-header .sse-popup-title {
+  font-weight: 600;
+  color: #414042;
+  font-size: 16px;
+}
+
+.sse-popup-header .sse-button-container {
+  display: flex;
+  align-items: center;
+}
+
+.sse-button-container .sse-popup-button {
+  padding: 5px;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.sse-button-container .sse-popup-button:focus {
+  outline: none;
+}
+
+.sse-button-container .sse-save-button {
+  background-color: transparent;
+  border: 2px solid #388e3c;
+  color: #388e3c;
+  opacity: 0.7;
+  margin-right: 4px;
+}
+
+.sse-button-container .sse-save-button:hover {
+  background-color: #cdcdcd;
+  border: 2px solid #1b5e20;
+}
+
+.sse-button-container .sse-copy-button {
+  background-color: #388e3c;
+  opacity: 0.7;
+  margin-right: 4px;
+}
+
+.sse-button-container .sse-copy-button:hover {
+  background-color: #1b5e20;
+  opacity: 1;
+}
+
+.sse-button-container .sse-close-button {
+  background-color: #4c5760;
+  opacity: 0.7;
+}
+
+.sse-button-container .sse-close-button:hover {
+  background-color: #393d3f;
+  opacity: 1;
+}
+
+.sse-ocr-text {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-y: auto;
+  height: 163px;
+}
+
+.sse-ocr-text::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sse-ocr-text::-webkit-scrollbar-thumb {
+  background: #bdb8b0;
+  border-radius: 8px;
+}
+
+/* 추가된 깜빡이는 커서 효과 */
+.blinking-cursor {
+  animation: blink-effect 1s step-end infinite;
+}
+
+@keyframes blink-effect {
+  50% {
+    opacity: 0;
+  }
+}
